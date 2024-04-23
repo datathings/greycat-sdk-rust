@@ -1,0 +1,429 @@
+// use std::fs::File;
+// use std::io::BufWriter;
+// use std::path::PathBuf;
+
+// use anyhow::{anyhow, bail};
+// use base64::{engine::general_purpose::URL_SAFE, Engine as _};
+// use clap::{Parser, Subcommand};
+// use greycat::prelude::*;
+// use greycat::serialize::AbiSerialize;
+// use reqwest::blocking::{Client, RequestBuilder, Response};
+// use reqwest::StatusCode;
+// use serde::Serialize;
+// use sha2::{Digest, Sha256};
+
+// const ABI_ENDPOINT: &str = "runtime::Runtime::abi";
+
+// #[derive(Debug, Parser)]
+// #[command(name = "greycat-client", about = "GreyCat Client CLI", long_about = None)]
+// struct Cli {
+//     #[arg(long, default_value = "localhost")]
+//     host: String,
+
+//     #[arg(short, long, default_value = "8080")]
+//     port: u16,
+
+//     #[arg(long)]
+//     auth: Option<String>,
+
+//     #[command(subcommand)]
+//     command: Commands,
+
+//     /// Will be set if `auth_if_needed` is successful
+//     token: Option<String>,
+// }
+
+// impl Cli {
+//     fn url(&self, path: &str) -> String {
+//         let Self { host, port, .. } = self;
+//         format!("http://{host}:{port}/{path}")
+//     }
+
+//     fn get(&self, path: &str) -> anyhow::Result<RequestBuilder> {
+//         let client = Client::builder().build()?;
+//         let mut builder = client.get(self.url(path));
+//         if let Some(token) = self.token.as_deref() {
+//             builder = builder.header("Authorization", token);
+//         }
+//         Ok(builder)
+//     }
+
+//     fn post(&self, path: &str) -> anyhow::Result<RequestBuilder> {
+//         let client = Client::builder().build()?;
+//         let mut builder = client.post(self.url(path));
+//         if let Some(token) = self.token.as_deref() {
+//             builder = builder.header("Authorization", token);
+//         }
+//         Ok(builder)
+//     }
+
+//     fn _put(&self, path: &str) -> anyhow::Result<RequestBuilder> {
+//         let client = Client::builder().build()?;
+//         let mut builder = client.put(self.url(path));
+//         if let Some(token) = self.token.as_deref() {
+//             builder = builder.header("Authorization", token);
+//         }
+//         Ok(builder)
+//     }
+
+//     fn auth_if_needed(&mut self) -> anyhow::Result<()> {
+//         match self.auth.as_deref() {
+//             Some(auth) => match auth.split_once(':') {
+//                 Some((username, password)) => {
+//                     let mut hasher = Sha256::new();
+//                     hasher.update(password.as_bytes());
+//                     let hashed_password = hasher.finalize();
+//                     let hashed_password = hex::encode(hashed_password);
+//                     let credentials =
+//                         URL_SAFE.encode(format!("{username}:{hashed_password}").as_bytes());
+
+//                     let req = self.post("runtime::User::login")?;
+//                     let token = req
+//                         .json(&serde_json::json!([credentials, false]))
+//                         .header("content-type", "application/json")
+//                         .header("accept", "application/json")
+//                         .send_and_check()?
+//                         .json::<String>()?;
+
+//                     self.token = Some(token);
+//                     Ok(())
+//                 }
+//                 None => bail!("malformed auth, expected format: \"username:password\""),
+//             },
+//             None => Ok(()),
+//         }
+//     }
+// }
+
+// #[derive(Debug, Subcommand)]
+// enum Commands {
+//     #[command(about = "Prints info about the ABI")]
+//     Abi {
+//         #[command(subcommand)]
+//         command: Option<AbiCommand>,
+//     },
+
+//     #[command(
+//         about = "Downloads a file from the server",
+//         arg_required_else_help = true
+//     )]
+//     Get {
+//         #[arg(help = "Path to the file to download. Omit the /files/ prefix.")]
+//         path: String,
+
+//         #[arg(long, short, help = "Write to file instead of stdout")]
+//         output: Option<PathBuf>,
+//     },
+
+//     #[command(about = "Calls the specified @expose'd function")]
+//     Post {
+//         #[arg(help = "Fully qualified name (eg. mod::type::name)")]
+//         endpoint: String,
+
+//         #[arg(help = "The function arguments")]
+//         args: Vec<String>,
+
+//         #[arg(short, long, help = "Receive the payload in JSON")]
+//         json: bool,
+//     },
+// }
+
+// #[derive(Debug, Subcommand)]
+// enum AbiCommand {
+//     #[command(about = "Prints the ABI symbols")]
+//     Symbols,
+//     #[command(aliases = ["t", "type"], about = "Prints the ABI types")]
+//     Types {
+//         #[arg(help = "Shows only that type if the fqn matches")]
+//         fqn: Option<String>,
+//     },
+//     #[command(aliases = ["e", "enum"], about = "Prints the ABI enums")]
+//     Enums {
+//         #[arg(help = "Shows only that enum if the fqn matches")]
+//         fqn: Option<String>,
+//     },
+//     #[command(aliases = ["f", "fn", "function"], about = "Prints the ABI functions")]
+//     Functions {
+//         #[arg(help = "Shows only that function if the fqn matches")]
+//         fqn: Option<String>,
+//     },
+//     #[command(name = "modvars", aliases = ["m", "mv", "var"], about = "Prints the ABI module variables")]
+//     ModVars,
+// }
+
+// fn main() -> anyhow::Result<()> {
+//     let mut cli = Cli::parse();
+
+//     cli.auth_if_needed()?;
+
+//     match &cli.command {
+//         Commands::Abi { command } => match command {
+//             None => {
+//                 let bytes = cli
+//                     .post(ABI_ENDPOINT)?
+//                     .header("accept", "application/octet-stream")
+//                     .send_and_check()?
+//                     .bytes()?;
+//                 let mut bytes = &bytes[..];
+
+//                 let headers = AbiHeaders::from_bytes(&mut bytes)?;
+//                 let symbols = AbiSymbols::from_bytes(&mut bytes)?;
+//                 let types = AbiTypes::from_bytes(&mut bytes, &symbols)?;
+//                 let functions = AbiFunctions::from_bytes(&mut bytes, &symbols, &types)?;
+
+//                 #[derive(Debug, Serialize)]
+//                 #[allow(dead_code)]
+//                 struct Info {
+//                     abi: AbiHeaders,
+//                     nb_symbols: usize,
+//                     types: TypeInfo,
+//                     functions: FnInfo,
+//                 }
+
+//                 #[derive(Debug, Serialize)]
+//                 #[allow(dead_code)]
+//                 struct TypeInfo {
+//                     total: usize,
+//                     types: usize,
+//                     enums: usize,
+//                 }
+
+//                 #[derive(Debug, Serialize)]
+//                 #[allow(dead_code)]
+//                 struct FnInfo {
+//                     total: usize,
+//                     fns: usize,
+//                     tasks: usize,
+//                 }
+
+//                 let info = Info {
+//                     abi: headers,
+//                     nb_symbols: symbols.len(),
+//                     types: TypeInfo {
+//                         total: types.len(),
+//                         types: types.iter().filter(|t| !t.is_enum).count(),
+//                         enums: types.iter().filter(|t| t.is_enum).count(),
+//                     },
+//                     functions: FnInfo {
+//                         total: functions.len(),
+//                         fns: functions.iter().filter(|f| !f.is_task).count(),
+//                         tasks: functions.iter().filter(|f| f.is_task).count(),
+//                     },
+//                 };
+
+//                 serde_json::to_writer(std::io::stdout(), &info)?;
+//             }
+//             Some(command) => match command {
+//                 AbiCommand::Symbols => {
+//                     let bytes = cli
+//                         .post(ABI_ENDPOINT)?
+//                         .header("accept", "application/octet-stream")
+//                         .send_and_check()?
+//                         .bytes()?;
+//                     let mut bytes = &bytes[..];
+
+//                     let _ = bytes.read_abi_headers()?;
+//                     let symbols = bytes.read_abi_symbols()?;
+
+//                     serde_json::to_writer(std::io::stdout(), &*symbols)?;
+//                 }
+//                 AbiCommand::Types { fqn } => {
+//                     let bytes = cli
+//                         .post(ABI_ENDPOINT)?
+//                         .header("accept", "application/octet-stream")
+//                         .send_and_check()?
+//                         .bytes()?;
+//                     let mut bytes = &bytes[..];
+
+//                     let _ = bytes.read_abi_headers()?;
+//                     let symbols = bytes.read_abi_symbols()?;
+//                     let types = bytes.read_abi_types(&symbols)?;
+
+//                     match fqn {
+//                         Some(fqn) => match types.get_by_fqn(fqn) {
+//                             Some(ty) => serde_json::to_writer(std::io::stdout(), &ty)?,
+//                             None => bail!("unknown type '{fqn}'"),
+//                         },
+//                         None => {
+//                             serde_json::to_writer(std::io::stdout(), &types)?;
+//                         }
+//                     }
+//                 }
+//                 AbiCommand::Enums { fqn } => {
+//                     let bytes = cli
+//                         .post(ABI_ENDPOINT)?
+//                         .header("accept", "application/octet-stream")
+//                         .send_and_check()?
+//                         .bytes()?;
+//                     let mut bytes = &bytes[..];
+
+//                     let _ = bytes.read_abi_headers()?;
+//                     let symbols = bytes.read_abi_symbols()?;
+//                     let types = bytes.read_abi_types(&symbols)?;
+
+//                     match fqn {
+//                         Some(fqn) => {
+//                             let en = types
+//                                 .iter()
+//                                 .filter(|t| t.is_enum)
+//                                 .find(|en| en.fqn().eq(fqn));
+//                             match en {
+//                                 Some(en) => serde_json::to_writer(std::io::stdout(), &en)?,
+//                                 None => bail!("unknown enum '{fqn}'"),
+//                             }
+//                         }
+//                         None => {
+//                             let enums: Vec<_> = types.iter().filter(|t| t.is_enum).collect();
+//                             serde_json::to_writer(std::io::stdout(), &enums)?;
+//                         }
+//                     }
+//                 }
+//                 AbiCommand::Functions { fqn } => {
+//                     let bytes = cli
+//                         .post(ABI_ENDPOINT)?
+//                         .header("accept", "application/octet-stream")
+//                         .send_and_check()?
+//                         .bytes()?;
+//                     let mut bytes = &bytes[..];
+
+//                     let _ = bytes.read_abi_headers()?;
+//                     let symbols = bytes.read_abi_symbols()?;
+//                     let types = bytes.read_abi_types(&symbols)?;
+//                     let functions = bytes.read_abi_functions(&symbols, &types)?;
+
+//                     match fqn {
+//                         Some(fqn) => match functions.get_by_fqn(fqn) {
+//                             Some(function) => serde_json::to_writer(std::io::stdout(), function)?,
+//                             None => bail!("unknown function '{fqn}', is it an @expose'd function?"),
+//                         },
+//                         None => {
+//                             serde_json::to_writer(std::io::stdout(), &functions)?;
+//                         }
+//                     }
+//                 }
+//                 AbiCommand::ModVars => {
+//                     let bytes = cli
+//                         .post(ABI_ENDPOINT)?
+//                         .header("accept", "application/octet-stream")
+//                         .send_and_check()?
+//                         .bytes()?;
+//                     let mut bytes = &bytes[..];
+
+//                     let _ = bytes.read_abi_headers()?;
+//                     let symbols = bytes.read_abi_symbols()?;
+//                     let types = bytes.read_abi_types(&symbols)?;
+
+//                     serde_json::to_writer(std::io::stdout(), &types.get_modvars())?;
+//                 }
+//             },
+//         },
+//         Commands::Get { path, output } => {
+//             let mut writer: Box<dyn std::io::Write> = match output {
+//                 Some(filepath) => {
+//                     let file = File::create(filepath)?;
+//                     let writer = BufWriter::new(file);
+//                     Box::new(writer)
+//                 }
+//                 None => {
+//                     let writer = BufWriter::new(std::io::stdout());
+//                     Box::new(writer)
+//                 }
+//             };
+
+//             cli.get(&format!("/files/{path}"))?
+//                 .send_and_check()?
+//                 .copy_to(&mut writer)?;
+//         }
+//         Commands::Post {
+//             endpoint,
+//             args,
+//             json,
+//         } => {
+//             let args: Vec<serde_json::Value> = args
+//                 .iter()
+//                 .map(|arg| match serde_json::from_str(arg) {
+//                     Ok(value) => value,
+//                     _ => serde_json::Value::String(arg.clone()),
+//                 })
+//                 .collect();
+
+//             if *json {
+//                 let value: serde_json::Value = cli
+//                     .post(endpoint)?
+//                     .json(&args)
+//                     .header("content-type", "application/json")
+//                     .header("accept", "application/json")
+//                     .send_and_check()?
+//                     .json()?;
+
+//                 serde_json::to_writer(&mut std::io::stdout(), &value)?;
+//                 return Ok(());
+//             }
+
+//             let bytes = cli
+//                 .post(ABI_ENDPOINT)?
+//                 .header("accept", "application/octet-stream")
+//                 .send_and_check()?
+//                 .bytes()?;
+//             let mut bytes = &bytes[..];
+
+//             let headers = bytes.read_abi_headers()?;
+//             let symbols = bytes.read_abi_symbols()?;
+//             let types = bytes.read_abi_types(&symbols)?;
+//             let functions = bytes.read_abi_functions(&symbols, &types)?;
+
+//             let abi = Abi {
+//                 headers,
+//                 symbols: &symbols,
+//                 types: types.clone(),
+//                 functions: functions.clone(),
+//             };
+
+//             let mut body = Vec::new();
+//             abi.headers.write_to(&mut body, &abi)?;
+//             for arg in args.iter().map(Value::from) {
+//                 arg.write_to(&mut body, &abi)?;
+//             }
+
+//             let bytes = cli
+//                 .post(endpoint)?
+//                 .body(body)
+//                 .header("accept", "application/octet-stream")
+//                 .header("content-type", "application/octet-stream")
+//                 .send_and_check()?
+//                 .bytes()?;
+//             let mut bytes = &bytes[..];
+
+//             let _ = bytes.read_request_headers()?;
+//             let (value, _) = Value::from_bytes(bytes, &abi)?;
+//             serde_json::to_writer(&mut std::io::stdout(), &value)?;
+//         }
+//     }
+
+//     Ok(())
+// }
+
+// trait RequestBuilderExt {
+//     fn send_and_check(self) -> anyhow::Result<Response>;
+// }
+
+// impl RequestBuilderExt for RequestBuilder {
+//     fn send_and_check(self) -> anyhow::Result<Response> {
+//         let req = self.build()?;
+//         let client = Client::new();
+//         let method = req.method().clone();
+//         let res = client.execute(req)?;
+//         match res.status() {
+//             StatusCode::OK => Ok(res),
+//             StatusCode::BAD_REQUEST => {
+//                 let req = format!("{method} {}", res.url());
+//                 eprintln!("BAD_REQUEST {req}");
+//                 Err(anyhow!(res.json::<serde_json::Value>()?).context(req))
+//             }
+//             status => {
+//                 let req = format!("{method} {}", res.url());
+//                 Err(anyhow!(status).context(req))
+//             }
+//         }
+//     }
+// }

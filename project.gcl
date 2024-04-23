@@ -1,0 +1,93 @@
+// This is a test project
+
+@include("fixtures");
+
+var n: node?;
+var nl: nodeList?;
+var nt: nodeTime?;
+var ni: nodeIndex?;
+var ng: nodeGeo?;
+
+type Foo {
+  @expose
+  static fn bar(): String {
+    return "foobar";
+  }
+}
+
+fn main() {
+  n ?= node::new(42);
+  if (nl == null) {
+    nl = nodeList::new();
+    nl.add("hello");
+    nl.add("world");
+  }
+  nt ?= nodeTime::newAt(42_time, { inline: "typerino" });
+  if (ni == null) {
+    ni = nodeIndex::new();
+    ni.set(42, "this key is a number");
+    ni.set("the key", "this key is a string");
+    ni.set(1337_time, "this key is a time");
+  }
+  if (ng == null) {
+    ng = nodeGeo::new();
+    ng.set(42_geo, "somewhere");
+  }
+}
+
+type Stats {
+  total: int;
+}
+
+type Person {
+  name: String;
+  age: int;
+}
+
+type PersonGroup {
+  name: String;
+  admin: Person;
+  members: Array<Person>;
+  recursion: PersonGroup?;
+}
+
+@expose
+fn anything(v: any?): any? {
+  return v;
+}
+
+@expose
+fn add(a: int, b: int): int {
+  return a + b;
+}
+
+@expose
+fn concat(a: String, b: String): String {
+  return a + b;
+}
+
+var value: int?;
+
+@expose
+@write
+task some_task() {
+  value ?= 0;
+  value = value + 1;
+
+  return {
+    at_time: time::now(),
+    value: value,
+  };
+}
+
+@expose
+task compute(a: int, b: int): int {
+  return a + b;
+}
+
+use runtime;
+
+@expose
+task runtime_info() {
+  return Runtime::info();
+}

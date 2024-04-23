@@ -1,0 +1,8 @@
+[package]
+name = "greycat"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+greycat-sys = { path = "../greycat-sys" }
+greycat-macro = { path = "../greycat-macro" }

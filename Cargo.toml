@@ -1,0 +1,14 @@
+[workspace]
+members = [
+  "greycat-sys",
+  "greycat-macro",
+  "greycat",
+  "greycat-sdk",
+  "greycat-cli",
+]
+resolver = "2"
+
+[profile.release]
+strip = true
+lto = true
+panic = "abort"

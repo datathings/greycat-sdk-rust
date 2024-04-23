@@ -1,0 +1,61 @@
+use io;
+
+enum Status { A; B; C; D; E; F; }
+
+enum TxFlags { A; B; C; D; E; F; }
+
+type Detail { a: int; b: int; }
+
+type Record {
+  id: int;
+  amount: int;
+  status: Status;
+  flags: TxFlags?;
+  de: Detail;
+  value: int;
+  value2: int?;
+  value3: int?;
+  desc: any?;
+  extra: any?;
+}
+
+fn run() {
+  var f_name = "${File::baseDir()}/records.gcb";
+  var t_start = time::now();
+
+  var w = GcbWriter::new(f_name);
+  var i = 10_000_000;
+  var tot = 0;
+  while (i != 0) {
+    var r = Record {
+      id: i,
+      amount: i * 10,
+      status: Status::D,
+      de: Detail { a: 3, b: 12 },
+      value: i * 5,
+      value2: i * 42,
+      value3: 12 * 12 * i,
+    };
+    tot = tot + r.amount;
+    w.write(r);
+    i--;
+  }
+  w = null;
+
+  var t_end_write = time::now();
+  println("write_duration: ${t_end_write - t_start}");
+  var f = GcbReader::new(f_name);
+
+  var t_start_read = time::now();
+  var tot2 = 0;
+  while (f.available() > 0) {
+    var r = f.read() as Record;
+    //println(r);
+    tot2 = tot2 + r.amount;
+  }
+  if (tot != tot2) {
+    throw "error";
+  }
+  var t_end_read = time::now();
+  println("read_duration: ${t_end_read - t_start_read}");
+}

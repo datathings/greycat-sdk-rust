@@ -1,0 +1,92 @@
+use project;
+
+@expose fn int() {
+  return 42;
+}
+
+@expose fn float() {
+  return 3.1415;
+}
+
+@expose fn array() {
+  return [42, 3.1415];
+}
+
+@expose fn stringlit() {
+  return "string literal";
+}
+
+@expose fn string() {
+  var s = "Hello, ";
+  return "${s} world!";
+}
+
+@expose fn node() {
+  return n;
+}
+
+@expose fn nodeList() {
+  return nl;
+}
+
+@expose fn nodeTime() {
+  return nt;
+}
+
+@expose fn nodeIndex() {
+  return ni;
+}
+
+@expose fn nodeGeo() {
+  return ng;
+}
+
+@expose fn geo() {
+  return geo::new(48.1173, -1.6777);
+}
+
+@expose fn time() {
+  return [time::min, time::now(), time::max];
+}
+
+@expose fn duration() {
+  return [-45_s, 42_min, 1337_s];
+}
+
+@expose fn map() {
+  var map = Map<any, any>::new();
+  map.set("this is a geo", geo());
+  map.set("this is a node", node());
+  map.set(TimeZone::Europe_Paris, "the key is an enum");
+  map.set(42, "the key is an int");
+  map.set(3.1415, "the key is a float");
+  return map;
+}
+
+@expose fn object() {
+  return { hello: "world" };
+}
+
+@expose fn object2() {
+  return {
+    name: "John",
+    age: 42,
+    children: [
+      { name: "Marcel", age: 12 },
+      { name: "Pedrolita", age: 8 },
+    ],
+  };
+}
+
+type Product {
+  name: String;
+  price: float;
+  description: String?;
+}
+
+@expose fn product(): Product {
+  return Product {
+    name: "Phone",
+    price: 85.29,
+  };
+}

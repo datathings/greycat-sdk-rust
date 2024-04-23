@@ -1,0 +1,13 @@
+[package]
+name = "greycat-sdk"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.75"
+byteorder = "1.5.0"
+ordered-float = { version = "4.1.1", features = ["serde"] }
+serde = { version = "1.0.189", features = ["derive", "rc"] }
+morton-encoding = "2.0.1"
+chrono = "0.4.31"
+serde_json = "1.0.113"

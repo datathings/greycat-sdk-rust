@@ -1,0 +1,17 @@
+[package]
+name = "greycat-cli"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0.75"
+base64 = "0.21.7"
+clap = { version = "4.4.17", features = ["derive"]}
+greycat-sdk = { path = "../greycat-sdk" }
+hex = "0.4.3"
+reqwest = { version = "0.11.22", features = ["blocking", "json"] }
+serde = "1.0.189"
+serde_json = "1.0.113"
+sha2 = "0.10.8"
