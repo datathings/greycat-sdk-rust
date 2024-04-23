@@ -1,4 +1,4 @@
-image: oci.datathings.com/greycat/crossbuild:4.1.16-rust
+image: oci.datathings.com/greycat/crossbuild:4.1.17-rust
 
 variables:
   GIT_STRATEGY: clone
