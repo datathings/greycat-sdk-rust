@@ -45,14 +45,9 @@ create_primitive_i64!(Time, "core::time", crate::primitive::TIME);
 
 impl std::fmt::Debug for Time {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        use chrono::{DateTime, Utc};
-
-        match chrono::NaiveDateTime::from_timestamp_micros(self.0) {
+        match chrono::DateTime::from_timestamp_micros(self.0) {
             // display the timestamp as an ISO8601
-            Some(ndt) => {
-                let dt = DateTime::<Utc>::from_naive_utc_and_offset(ndt, Utc);
-                dt.fmt(f)
-            }
+            Some(dt) => dt.fmt(f),
             // display the actual value if the timestamp is out-of-range of NaiveDateTime
             None => self.0.fmt(f),
         }

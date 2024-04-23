@@ -1,6 +1,6 @@
 use std::{collections::HashMap, fs::File, time::Instant};
 
-use greycat::prelude::*;
+use greycat_sdk::prelude::*;
 use reqwest::blocking::*;
 
 fn main() -> anyhow::Result<()> {

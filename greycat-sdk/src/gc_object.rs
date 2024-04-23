@@ -5,8 +5,8 @@ use std::io::Write;
 use std::rc::Rc;
 
 use crate::abi::{Abi, AbiType};
-use crate::deserialize::AbiDeserialize;
-use crate::prelude::TypeLoader;
+// use crate::deserialize::AbiDeserialize;
+// use crate::prelude::TypeLoader;
 use crate::primitive;
 use crate::serialize::*;
 use crate::value::Value;
@@ -51,15 +51,15 @@ impl<'abi> GcObject<'abi> {
     }
 }
 
-impl<'abi, R> TypeLoader for R
-where
-    R: std::io::Read,
-{
-    fn load(&mut self, ty: Rc<AbiType>, abi: &Abi) -> Result<Value> {
-        let value = AbiDeserialize::read_typed_object(self, ty, abi)?;
-        Ok(Value::Obj(value))
-    }
-}
+// impl<'abi, R> TypeLoader for R
+// where
+//     R: std::io::Read,
+// {
+//     fn load(&mut self, ty: Rc<AbiType>, abi: &Abi) -> Result<Value> {
+//         let value = AbiDeserialize::read_typed_object(self, ty, abi)?;
+//         Ok(Value::Obj(value))
+//     }
+// }
 
 impl AbiSerialize for GcObject<'_> {
     fn write_to<W: Write>(&self, writer: &mut W, abi: &Abi) -> Result<usize> {

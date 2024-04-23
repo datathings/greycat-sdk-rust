@@ -5,7 +5,6 @@ use anyhow::Result;
 
 use crate::abi::{Abi, AbiType};
 use crate::library::*;
-use crate::prelude::GcObject;
 
 #[derive(Default, Clone)]
 pub struct StdLibrary {
@@ -20,10 +19,10 @@ impl Library for StdLibrary {
 
     fn configure(
         &self,
-        loaders: &mut BTreeMap<&'static str, Box<dyn TypeLoader>>,
-        factories: &mut BTreeMap<&'static str, Box<dyn TypeFactory>>,
+        _loaders: &mut BTreeMap<&'static str, Box<dyn TypeLoader>>,
+        _factories: &mut BTreeMap<&'static str, Box<dyn TypeFactory>>,
     ) -> Result<()> {
-        loaders.insert("core::String", Box::new(TypeLoader::<GcObject>::load));
+        // loaders.insert("core::String", Box::new(TypeLoader::<GcObject>::load));
         Ok(())
     }
 

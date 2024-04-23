@@ -2,7 +2,7 @@ use std::{fs::File, io::BufReader, path::PathBuf};
 
 use anyhow::Context;
 use clap::Parser;
-use greycat::prelude::*;
+use greycat_sdk::prelude::*;
 
 #[derive(Parser)]
 struct Args {
