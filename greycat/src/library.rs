@@ -12,7 +12,7 @@ impl From<*mut gc_program_library_t> for Library {
 }
 
 impl Library {
-    pub fn configure(&mut self, start: gc_lifecycle_function_t, stop: gc_lifecycle_function_t) {
+    pub fn configure(&self, start: gc_lifecycle_function_t, stop: gc_lifecycle_function_t) {
         unsafe { gc_program_library__configure(self.0, start, stop) }
     }
 }

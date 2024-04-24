@@ -1,51 +1,51 @@
 use project;
 
-@expose fn int() {
+@expose fn int(): int {
   return 42;
 }
 
-@expose fn float() {
+@expose fn float(): float {
   return 3.1415;
 }
 
-@expose fn array() {
+@expose fn array(): Array {
   return [42, 3.1415];
 }
 
-@expose fn stringlit() {
+@expose fn stringlit(): String {
   return "string literal";
 }
 
-@expose fn string() {
+@expose fn string(): String {
   var s = "Hello, ";
   return "${s} world!";
 }
 
-@expose fn node() {
+@expose fn node(): node? {
   return n;
 }
 
-@expose fn nodeList() {
+@expose fn nodeList(): nodeList? {
   return nl;
 }
 
-@expose fn nodeTime() {
+@expose fn nodeTime(): nodeTime? {
   return nt;
 }
 
-@expose fn nodeIndex() {
+@expose fn nodeIndex(): nodeIndex? {
   return ni;
 }
 
-@expose fn nodeGeo() {
+@expose fn nodeGeo(): nodeGeo? {
   return ng;
 }
 
-@expose fn geo() {
+@expose fn geo(): geo {
   return geo::new(48.1173, -1.6777);
 }
 
-@expose fn time() {
+@expose fn time(): Array<time> {
   return [time::min, time::now(), time::max];
 }
 
@@ -54,7 +54,7 @@ use project;
 }
 
 @expose fn map() {
-  var map = Map<any, any>::new();
+  var map = Map<any, any?>::new();
   map.set("this is a geo", geo());
   map.set("this is a node", node());
   map.set(TimeZone::Europe_Paris, "the key is an enum");

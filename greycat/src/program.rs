@@ -43,7 +43,7 @@ impl Program {
         }
     }
 
-    pub fn link_type<const F: usize>(&mut self, mod_name: &str, mut ty: Type<'_, F>) -> bool {
+    pub fn link_type<const F: usize>(&self, mod_name: &str, ty: Type<'_, F>) -> bool {
         let mod_id = self.resolve_module_id(mod_name);
         if mod_id == 0 {
             return false;
@@ -68,7 +68,7 @@ impl Program {
                 ty.create,
                 ty.finalize,
                 ty.to_string,
-                ty.functions.as_mut_ptr(),
+                ty.functions.as_ptr(),
                 fn_offsets.as_mut_ptr(),
                 ty.functions.len() as _,
             )
@@ -77,7 +77,7 @@ impl Program {
         true
     }
 
-    pub fn link_mod<const F: usize>(&mut self, module: &Module<'_, F>) -> bool {
+    pub fn link_mod<const F: usize>(&self, module: &Module<'_, F>) -> bool {
         let mod_id = self.resolve_module_id(module.name);
         if mod_id == 0 {
             return false;

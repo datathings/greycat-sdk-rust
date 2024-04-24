@@ -37,7 +37,7 @@ impl GObj {
         Value::from(self.get_slot_at(offset, ctx))
     }
 
-    pub fn set(&mut self, key: u32, value: impl AsSlot, ctx: &Machine) -> bool {
+    pub fn set(&self, key: u32, value: impl AsSlot, ctx: &Machine) -> bool {
         let (value, ty) = value.as_slot();
         unsafe { gc_object__set(self.0, key, value, ty, ctx.0) }
     }
@@ -83,7 +83,7 @@ impl GObject {
         Value::from(self.get_slot_at(offset))
     }
 
-    pub fn set(&mut self, key: u32, value: impl AsSlot) -> bool {
+    pub fn set(&self, key: u32, value: impl AsSlot) -> bool {
         let (value, ty) = value.as_slot();
         unsafe { gc_object__set(self.ptr, key, value, ty, self.ctx) }
     }

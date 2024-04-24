@@ -11,7 +11,7 @@ impl Machine {
         Buffer::from(unsafe { gc_machine__get_buffer(self.0) })
     }
 
-    pub fn set_error(&mut self, message: &str) {
+    pub fn set_error(&self, message: &str) {
         let c_str =
             CString::new(message).expect("set_error 'message' must not contain any 0 bytes");
         unsafe { gc_machine__set_runtime_error(self.0, c_str.as_ptr()) }
@@ -158,33 +158,33 @@ impl Machine {
     }
 
     #[inline]
-    pub fn set_result(&mut self, value: impl AsSlot) {
+    pub fn set_result(&self, value: impl AsSlot) {
         let (slot, slot_type) = value.as_slot();
         unsafe { gc_machine__set_result(self.0, slot, slot_type) }
     }
 
     #[inline]
-    pub fn set_result_int(&mut self, value: i64) {
+    pub fn set_result_int(&self, value: i64) {
         unsafe { gc_machine__set_result(self.0, value.into(), gc_type_int) }
     }
 
     #[inline]
-    pub fn set_result_float(&mut self, value: f64) {
+    pub fn set_result_float(&self, value: f64) {
         unsafe { gc_machine__set_result(self.0, value.into(), gc_type_float) }
     }
 
     #[inline]
-    pub fn set_result_bool(&mut self, value: bool) {
+    pub fn set_result_bool(&self, value: bool) {
         unsafe { gc_machine__set_result(self.0, value.into(), gc_type_bool) }
     }
 
     #[inline]
-    pub fn set_result_null(&mut self) {
+    pub fn set_result_null(&self) {
         unsafe { gc_machine__set_result(self.0, gc_slot_t::default(), gc_type_null) }
     }
 
     #[inline]
-    pub fn set_result_obj(&mut self, value: *mut gc_object_t) {
+    pub fn set_result_obj(&self, value: *mut gc_object_t) {
         unsafe { gc_machine__set_result(self.0, value.into(), gc_type_object) }
     }
 
