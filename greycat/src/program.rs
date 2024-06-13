@@ -116,8 +116,6 @@ pub struct Type<'a, const F: usize> {
     pub foreach_slots: gc_object_type_foreach_slots_t,
     pub load: gc_object_type_load_t,
     pub save: gc_object_type_save_t,
-    pub create: gc_object_type_create_t,
-    pub finalize: gc_object_type_finalize_t,
     pub to_string: gc_object_type_to_string_t,
     pub functions: [gc_program_function_body_t; F],
 }
