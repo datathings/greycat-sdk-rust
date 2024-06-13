@@ -11,6 +11,9 @@ struct Args {
 
     #[arg(help = "The file to read")]
     filepath: PathBuf,
+
+    #[arg(long, help = "Displays headers", default_value = "false")]
+    show_headers: bool,
 }
 
 fn main() -> anyhow::Result<()> {
@@ -24,6 +27,9 @@ fn main() -> anyhow::Result<()> {
     let mut value_bytes = &value_buf[..];
 
     let v_headers = value_bytes.read_request_headers()?;
+    if args.show_headers {
+        println!("{v_headers:#?}");
+    }
     if abi.headers.headers.protocol != v_headers.protocol {
         anyhow::bail!(
             "mismatched ABI protocol (got={}, expected={})",

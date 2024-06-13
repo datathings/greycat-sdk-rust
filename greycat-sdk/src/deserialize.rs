@@ -50,9 +50,9 @@ pub trait AbiDeserialize<'abi> {
     /// Reads a GreyCat object
     ///  - reads a `vu32` as type id
     ///  - use the type id loader to read the object value
-    fn read_object(&mut self, abi: &'abi Abi) -> Result<GcObject<'abi>>;
+    fn read_object(&mut self, abi: &'abi Abi) -> Result<Value<'abi>>;
     /// Reads an object value using the given `ty` loader
-    fn read_typed_object(&mut self, ty: Rc<AbiType>, abi: &'abi Abi) -> Result<GcObject<'abi>>;
+    fn read_typed_object(&mut self, ty: Rc<AbiType>, abi: &'abi Abi) -> Result<Value<'abi>>;
     /// Reads a GreyCat enum
     ///  - reads a `vu32` as type id
     ///  - reads a `vu32` as enum field offset
@@ -159,7 +159,7 @@ where
         Ok(value)
     }
 
-    fn read_object(&mut self, abi: &'abi Abi) -> Result<GcObject<'abi>> {
+    fn read_object(&mut self, abi: &'abi Abi) -> Result<Value<'abi>> {
         let type_id = self.read_vu32()?;
         let ty = abi
             .types
@@ -168,9 +168,16 @@ where
         self.read_typed_object(ty, abi)
     }
 
-    fn read_typed_object(&mut self, ty: Rc<AbiType>, abi: &'abi Abi) -> Result<GcObject<'abi>> {
+    fn read_typed_object(&mut self, ty: Rc<AbiType>, abi: &'abi Abi) -> Result<Value<'abi>> {
         if ty.is_native {
-            todo!()
+            // TODO remove this and only call:
+            // (pseudo-code)
+            // let loader = abi.library.get(ty.lib).loaders.get(ty.mapped_abi_type_offset)
+            // return loader(ty, abi)
+            match ty.mapped_abi_type_offset {
+                id if id == abi.types.core.string => return Ok(self.read_string(abi)?.into()),
+                _ => todo!("deserializer for \"{}\"", ty.named_fqn(abi)),
+            }
         }
 
         // TODO maybe add a anyhow Context or a better error handling here, even though, this should be
@@ -230,7 +237,7 @@ where
                             let attr_type_id = self.read_vu32()?;
                             attr_obj_ty = &abi.types[attr_type_id];
                         }
-                        Value::Obj(self.read_typed_object(Rc::clone(attr_obj_ty), abi)?)
+                        self.read_typed_object(Rc::clone(attr_obj_ty), abi)?
                     }
                     n => self.read_value_header(n, abi)?,
                 };
@@ -239,16 +246,16 @@ where
                 }
             }
 
-            return Ok(GcObject {
+            return Ok(Value::Obj(GcObject {
                 ty: prog_type,
                 values: Some(RefCell::new(values.into_boxed_slice())),
-            });
+            }));
         }
 
-        Ok(GcObject {
+        Ok(Value::Obj(GcObject {
             ty: prog_type,
             values: None,
-        })
+        }))
     }
 
     fn read_enum(&mut self, abi: &'abi Abi) -> Result<GcEnum<'abi>> {
@@ -297,7 +304,7 @@ where
             primitive::FN => todo!("fn ptr are not implemented yet"),
             primitive::STR_LIT => Value::Symbol(self.read_symbol(abi)?),
             primitive::ENUM => Value::Enum(self.read_enum(abi)?),
-            primitive::OBJECT => Value::Obj(self.read_object(abi)?),
+            primitive::OBJECT => self.read_object(abi)?,
             n => anyhow::bail!("unknown primitive type {n}"),
         };
 

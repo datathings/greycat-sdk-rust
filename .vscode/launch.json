@@ -1,0 +1,139 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in library 'greycat-sys'",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--lib",
+          "--package=greycat-sys"
+        ],
+        "filter": {
+          "name": "greycat-sys",
+          "kind": "lib"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in library 'greycat'",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--lib",
+          "--package=greycat"
+        ],
+        "filter": {
+          "name": "greycat",
+          "kind": "lib"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in library 'greycat-sdk'",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--lib",
+          "--package=greycat-sdk"
+        ],
+        "filter": {
+          "name": "greycat-sdk",
+          "kind": "lib"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug executable 'greycat-cli'",
+      "cargo": {
+        "args": [
+          "build",
+          "--bin=greycat-cli",
+          "--package=greycat-cli"
+        ],
+        "filter": {
+          "name": "greycat-cli",
+          "kind": "bin"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in executable 'greycat-cli'",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--bin=greycat-cli",
+          "--package=greycat-cli"
+        ],
+        "filter": {
+          "name": "greycat-cli",
+          "kind": "bin"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug executable 'gabi'",
+      "cargo": {
+        "args": [
+          "build",
+          "--bin=gabi",
+          "--package=greycat-cli"
+        ],
+        "filter": {
+          "name": "gabi",
+          "kind": "bin"
+        }
+      },
+      "args": ["string.gcb"],
+      "cwd": "/home/leiko/dev/datathings/greycat/sdk/js"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in executable 'gabi'",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--bin=gabi",
+          "--package=greycat-cli"
+        ],
+        "filter": {
+          "name": "gabi",
+          "kind": "bin"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}

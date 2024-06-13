@@ -65,8 +65,6 @@ impl Program {
                 ty.foreach_slots,
                 ty.load,
                 ty.save,
-                ty.create,
-                ty.finalize,
                 ty.to_string,
                 ty.functions.as_ptr(),
                 fn_offsets.as_mut_ptr(),

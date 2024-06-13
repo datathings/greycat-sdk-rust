@@ -5,7 +5,10 @@
 
 // include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
-use std::mem::MaybeUninit;
+use std::{alloc::GlobalAlloc, mem::MaybeUninit};
+
+#[doc = " must fit on 8 bits !"]
+pub type gc_type_t = u32;
 
 pub const gc_type_null: gc_type_t = 0;
 pub const gc_type_bool: gc_type_t = 1;
@@ -38,8 +41,21 @@ pub const gc_type_undefined: gc_type_t = 27;
 pub const gc_type_stringlit: gc_type_t = 28;
 pub const gc_type_error: gc_type_t = 29;
 
-#[doc = " must fit on 8 bits !"]
-pub type gc_type_t = u32;
+pub type gc_log_level_t = u32;
+
+pub const gc_log_level_none: gc_log_level_t = 0;
+pub const gc_log_level_error: gc_log_level_t = 1;
+pub const gc_log_level_warn: gc_log_level_t = 2;
+pub const gc_log_level_info: gc_log_level_t = 3;
+pub const gc_log_level_debug: gc_log_level_t = 4;
+pub const gc_log_level_trace: gc_log_level_t = 5;
+
+pub type gc_license_level_t = u32;
+
+pub const gc_license_level_community: gc_license_level_t = 0;
+pub const gc_license_level_pro: gc_license_level_t = 1;
+pub const gc_license_level_server: gc_license_level_t = 2;
+pub const gc_license_level_platform: gc_license_level_t = 3;
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -49,8 +65,11 @@ pub struct gc_buffer_t {
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
+// must be packed to 128 (64+32+32) bits
 pub struct gc_object_t {
-    _unused: [u8; 0],
+    block: *mut gc_block_t,
+    marks: u32,
+    type_id: u32,
 }
 
 #[repr(C)]
@@ -231,11 +250,27 @@ pub struct gc_core_tensor_t {
 }
 
 extern "C" {
+    pub fn gc_malloc(size: usize) -> *mut u8;
+    pub fn gc_free(ptr: *mut u8, size: usize);
+    pub fn gc_aligned_free(ptr: *mut u8, size: usize);
+    pub fn gc_align_malloc(size: usize, block_size: usize);
+
+    pub fn gc_gnu_malloc(size: usize) -> *mut u8;
+    pub fn gc_gnu_free(ptr: *mut u8);
+
+    pub fn gc_global_gnu_malloc(size: usize) -> *mut u8;
+    pub fn gc_global_gnu_free(ptr: *mut u8);
+
+    pub fn gc_mbedtls_ssl_config() -> *mut u8;
+    pub fn gc_common__current_us() -> i64;
+
     pub fn gc_machine__create_array(ctx: *const gc_machine_t) -> *mut gc_core_array_t;
     pub fn gc_machine__create_map(ctx: *const gc_machine_t) -> *mut gc_core_map_t;
     pub fn gc_machine__create_table(ctx: *const gc_machine_t) -> *mut gc_core_table_t;
     pub fn gc_machine__create_tensor(ctx: *const gc_machine_t) -> *mut gc_core_tensor_t;
     pub fn gc_machine__create_object(ctx: *const gc_machine_t, type_id: u32) -> *mut gc_object_t;
+
+    pub fn gc_machine__get_buffer(ctx: *mut gc_machine_t) -> *mut gc_buffer_t;
     pub fn gc_machine__get_param(ctx: *const gc_machine_t, offset: u32) -> gc_slot_t;
     pub fn gc_machine__get_param_type(ctx: *const gc_machine_t, offset: u32) -> gc_type_t;
     pub fn gc_machine__this(this: *mut gc_machine_t) -> gc_slot_t;
@@ -244,6 +279,8 @@ extern "C" {
         ctx: *mut gc_machine_t,
         msg: *const ::std::os::raw::c_char,
     );
+    pub fn gc_machine__set_runtime_error_syserr(ctx: *mut gc_machine_t);
+
     pub fn gc_object__get(
         this: *mut gc_object_t,
         key: u32,
@@ -271,6 +308,7 @@ extern "C" {
         ctx: *mut gc_machine_t,
     ) -> bool;
     pub fn gc_object__un_mark(this: *mut gc_object_t, ctx: *mut gc_machine_t);
+
     pub fn gc_core_string__create_from(
         str_: *const ::std::os::raw::c_char,
         len: u64,
@@ -278,18 +316,32 @@ extern "C" {
     pub fn gc_core_string__create_from_buffer(buf: *const gc_buffer_t) -> *mut gc_core_string_t;
     pub fn gc_core_string__buffer(str_: *const gc_core_string_t) -> *const ::std::os::raw::c_char;
     pub fn gc_core_string__size(str_: *const gc_core_string_t) -> u32;
-    pub fn gc_machine__get_buffer(ctx: *mut gc_machine_t) -> *mut gc_buffer_t;
+
+    pub fn gc_buffer__create() -> *mut gc_buffer_t;
+    pub fn gc_buffer__finalize(this: *mut gc_buffer_t);
     pub fn gc_buffer__clear(this: *mut gc_buffer_t);
-    pub fn gc_buffer__add_str(this: *mut gc_buffer_t, c: *const ::std::os::raw::c_char, len: u32);
-    pub fn gc_buffer__add_cstr(this: *mut gc_buffer_t, c: *const ::std::os::raw::c_char);
-    pub fn gc_buffer__add_char(this: *mut gc_buffer_t, c: ::std::os::raw::c_char);
-    pub fn gc_buffer__add_u64(this: *mut gc_buffer_t, i: u64);
     pub fn gc_buffer__add_slot(
         this: *mut gc_buffer_t,
         slot: gc_slot_t,
         ty: gc_type_t,
         ctx: *const gc_machine_t,
     );
+    pub fn gc_buffer__add_slot_as_json(
+        this: *mut gc_buffer_t,
+        slot: gc_slot_t,
+        ty: gc_type_t,
+        ctx: *const gc_machine_t,
+    );
+    pub fn gc_buffer__add_slot_as_binary(
+        this: *mut gc_buffer_t,
+        slot: gc_slot_t,
+        ty: gc_type_t,
+        ctx: *const gc_machine_t,
+    );
+    pub fn gc_buffer__add_str(this: *mut gc_buffer_t, c: *const ::std::os::raw::c_char, len: u32);
+    pub fn gc_buffer__add_cstr(this: *mut gc_buffer_t, c: *const ::std::os::raw::c_char);
+    pub fn gc_buffer__add_char(this: *mut gc_buffer_t, c: ::std::os::raw::c_char);
+    pub fn gc_buffer__add_u64(this: *mut gc_buffer_t, i: u64);
     pub fn gc_buffer__prepare(this: *mut gc_buffer_t, needed: u32);
     pub fn gc_buffer__data(this: *mut gc_buffer_t) -> *mut ::std::os::raw::c_char;
     pub fn gc_buffer__size(this: *mut gc_buffer_t) -> u32;
@@ -299,11 +351,61 @@ extern "C" {
         start: gc_lifecycle_function_t,
         stop: gc_lifecycle_function_t,
     );
-    pub fn gc_common__parse_number(str_: *const ::std::os::raw::c_char, str_len: *mut u32) -> u64;
-    pub fn gc_common__parse_sign_number(
-        str_: *const ::std::os::raw::c_char,
-        str_len: *mut u32,
-    ) -> i64;
+    pub fn gc_buffer__add_size(this: *mut gc_buffer_t, size_inc: u32);
+
+    pub fn gc_core_array__set_slot(
+        this: *mut gc_core_array_t,
+        offset: u32,
+        value: gc_slot_t,
+        ty: gc_type_t,
+        ctx: *mut gc_machine_t,
+    ) -> bool;
+    pub fn gc_core_array__get_slot(
+        this: *mut gc_core_array_t,
+        offset: u32,
+        value: *mut gc_slot_t,
+        ty: *mut gc_type_t,
+    ) -> bool;
+    pub fn gc_core_array__add_slot(
+        this: *mut gc_core_array_t,
+        value: gc_slot_t,
+        ty: gc_type_t,
+        ctx: *mut gc_machine_t,
+    ) -> bool;
+    pub fn gc_core_array__size(this: *const gc_core_array_t) -> u32;
+
+    pub fn gc_core_table__set_slot(
+        this: *mut gc_core_table_t,
+        row: i64,
+        col: i64,
+        value: gc_slot_t,
+        ty: gc_type_t,
+        ctx: *mut gc_machine_t,
+    );
+    pub fn gc_core_table__get_slot(
+        this: *mut gc_core_table_t,
+        row: i64,
+        col: i64,
+        value: *mut gc_slot_t,
+        ty: *mut gc_type_t,
+    );
+    pub fn gc_core_table__init(this: *mut gc_core_table_t, nb_cols: u32);
+
+    pub fn gc_common__parse_number(data: *const ::std::os::raw::c_char, len: *mut u32) -> u64;
+    pub fn gc_common__parse_sign_number(data: *const ::std::os::raw::c_char, len: *mut u32) -> i64;
+    pub fn gc_common__parse_date_iso8601(
+        data: *mut ::std::os::raw::c_char,
+        len: u32,
+        epoch_utc: *mut i64,
+    ) -> bool;
+
+    pub fn gc_license__level() -> gc_license_level_t;
+
+    pub fn gc_io_file__sync(fp: i32);
+    pub fn gc_io_file__open_rdwr(path: *mut gc_core_string_t, ctx: *mut gc_machine_t);
+    pub fn gc_io_file__open_read(path: *mut gc_core_string_t, ctx: *mut gc_machine_t);
+
+    pub fn gc_server__add_request(fn_: u32, data: *mut ::std::os::raw::c_char, len: u32) -> bool;
 
     // TODO clean below
 
@@ -331,8 +433,6 @@ extern "C" {
         foreach_slots: gc_object_type_foreach_slots_t,
         load: gc_object_type_load_t,
         save: gc_object_type_save_t,
-        create: gc_object_type_create_t,
-        finalize: gc_object_type_finalize_t,
         to_string: gc_object_type_to_string_t,
         functions: *const gc_program_function_body_t,
         offsets: *mut u32,
@@ -347,7 +447,7 @@ extern "C" {
     );
     pub fn gc_program__resolve_symbol(
         program: *const gc_program_t,
-        str_: *const ::std::os::raw::c_char,
+        data: *const ::std::os::raw::c_char,
         len: u32,
     ) -> u32;
     pub fn gc_program__resolve_module(program: *const gc_program_t, mod_name_offset: u32) -> u32;
@@ -389,6 +489,7 @@ pub type gc_program_function_body_t = Option<extern "C" fn(ctx: *mut gc_machine_
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
+// 128bits
 pub struct gc_block_t {
     _unused: [u8; 0],
 }

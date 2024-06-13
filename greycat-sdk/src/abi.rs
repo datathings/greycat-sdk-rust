@@ -755,6 +755,12 @@ impl AbiType {
     pub fn fqn(&self) -> String {
         format!("{}::{}", self.module, self.name)
     }
+
+    pub fn named_fqn(&self, abi: &Abi) -> String {
+        let module = &abi.symbols[self.module];
+        let name = &abi.symbols[self.name];
+        format!("{module}::{name}")
+    }
 }
 
 impl AbiFn {
