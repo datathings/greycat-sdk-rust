@@ -5,8 +5,6 @@
 
 // include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
-use std::{alloc::GlobalAlloc, mem::MaybeUninit};
-
 #[doc = " must fit on 8 bits !"]
 pub type gc_type_t = u32;
 
