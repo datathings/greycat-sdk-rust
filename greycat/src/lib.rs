@@ -6,7 +6,7 @@ mod buffer;
 mod gstring;
 mod gstr;
 mod gobject;
-// pub mod alloc;
+pub mod alloc;
 
 /// Re-export `greycat-macro`
 pub use greycat_macro::*;

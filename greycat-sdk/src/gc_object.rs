@@ -252,27 +252,27 @@ pub struct RefValue<'r, 'abi> {
     index: usize,
 }
 
-impl<'r, 'abi> RefValue<'r, 'abi> {
+impl<'abi> RefValue<'_, 'abi> {
     pub fn get(&self) -> &Value<'abi> {
         &self.inner[self.index]
     }
 }
 
-impl<'r, 'abi> Eq for RefValue<'r, 'abi> {}
+impl Eq for RefValue<'_, '_> {}
 
-impl<'r, 'abi> PartialEq for RefValue<'r, 'abi> {
+impl PartialEq for RefValue<'_, '_> {
     fn eq(&self, other: &Self) -> bool {
         self.get() == other.get()
     }
 }
 
-impl<'r, 'abi> std::fmt::Debug for RefValue<'r, 'abi> {
+impl std::fmt::Debug for RefValue<'_, '_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.get().fmt(f)
     }
 }
 
-impl<'r, 'abi> std::ops::Deref for RefValue<'r, 'abi> {
+impl<'abi> std::ops::Deref for RefValue<'_, 'abi> {
     type Target = Value<'abi>;
 
     #[inline(always)]

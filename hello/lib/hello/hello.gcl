@@ -1,0 +1,5 @@
+type CsvReader<T> {
+  private path: String;
+  native fn can_read(): bool;
+  native fn read(): T;
+}

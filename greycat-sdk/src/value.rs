@@ -65,7 +65,7 @@ impl std::default::Default for Value<'_> {
     }
 }
 
-impl<'abi> From<&serde_json::Value> for Value<'abi> {
+impl From<&serde_json::Value> for Value<'_> {
     fn from(value: &serde_json::Value) -> Self {
         match value {
             serde_json::Value::Null => Value::Null,
@@ -85,7 +85,7 @@ impl<'abi> From<&serde_json::Value> for Value<'abi> {
     }
 }
 
-impl<'abi> AbiSerialize for Value<'abi> {
+impl AbiSerialize for Value<'_> {
     fn write_to<W: Write>(&self, writer: &mut W, abi: &Abi) -> Result<usize> {
         match self {
             Value::Null => {
@@ -138,7 +138,7 @@ impl<'abi> AbiSerialize for Value<'abi> {
     }
 }
 
-impl<'a> std::fmt::Display for Value<'a> {
+impl std::fmt::Display for Value<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Value::Null => f.write_str("null"),
@@ -164,7 +164,7 @@ impl<'a> std::fmt::Display for Value<'a> {
     }
 }
 
-impl<'a> std::fmt::Debug for Value<'a> {
+impl std::fmt::Debug for Value<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Value::Null => f.write_str("null"),
@@ -207,7 +207,7 @@ impl<T: AbiSerialize, const N: usize> AbiSerialize for [T; N] {
     }
 }
 
-impl<'a, T: AbiSerialize> AbiSerialize for &'a [T] {
+impl<T: AbiSerialize> AbiSerialize for &[T] {
     fn write_to<W: Write>(&self, writer: &mut W, abi: &Abi) -> Result<usize> {
         writer.write_u8(primitive::OBJECT)?;
         let mut n = writer.write_vu32(abi.types.core.array)?;
@@ -224,7 +224,7 @@ impl<'a, T: AbiSerialize> AbiSerialize for &'a [T] {
     }
 }
 
-impl<'a, T: AbiSerialize> AbiSerialize for &'a Vec<T> {
+impl<T: AbiSerialize> AbiSerialize for &Vec<T> {
     fn write_to<W: Write>(&self, writer: &mut W, abi: &Abi) -> Result<usize> {
         writer.write_u8(primitive::OBJECT)?;
         let mut n = writer.write_vu32(abi.types.core.array)?;
@@ -241,7 +241,7 @@ impl<'a, T: AbiSerialize> AbiSerialize for &'a Vec<T> {
     }
 }
 
-impl<'a, K: AbiSerialize, V: AbiSerialize> AbiSerialize for &'a HashMap<K, V> {
+impl<K: AbiSerialize, V: AbiSerialize> AbiSerialize for &HashMap<K, V> {
     fn write_to<W: Write>(&self, writer: &mut W, abi: &Abi) -> Result<usize> {
         writer.write_u8(primitive::OBJECT)?;
         let mut n = writer.write_vu32(abi.types.core.map)?;
@@ -259,7 +259,7 @@ impl<'a, K: AbiSerialize, V: AbiSerialize> AbiSerialize for &'a HashMap<K, V> {
     }
 }
 
-impl<'a, K: AbiSerialize, V: AbiSerialize> AbiSerialize for &'a BTreeMap<K, V> {
+impl<K: AbiSerialize, V: AbiSerialize> AbiSerialize for &BTreeMap<K, V> {
     fn write_to<W: Write>(&self, writer: &mut W, abi: &Abi) -> Result<usize> {
         writer.write_u8(primitive::OBJECT)?;
         let mut n = writer.write_vu32(abi.types.core.map)?;
@@ -373,7 +373,7 @@ impl AbiSerialize for AnyString<'_> {
     }
 }
 
-impl<'a> AbiSerialize for &'a str {
+impl AbiSerialize for &str {
     fn write_to<W: Write>(&self, writer: &mut W, abi: &Abi) -> Result<usize> {
         match abi.symbols.get(self) {
             Some(off) => Symbol(off).write_to(writer, abi),

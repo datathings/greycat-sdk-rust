@@ -63,16 +63,16 @@ impl GObject {
 
     #[inline(always)]
     pub fn get_slot(&self, key: u32) -> (gc_slot_t, gc_type_t) {
-        let ty: &mut gc_type_t = &mut 0;
-        let slot = unsafe { gc_object__get(self.ptr, key, ty, self.ctx) };
-        (slot, *ty)
+        let mut ty: gc_type_t = gc_type_null;
+        let slot = unsafe { gc_object__get(self.ptr, key, &mut ty, self.ctx) };
+        (slot, ty)
     }
 
     #[inline(always)]
     pub fn get_slot_at(&self, offset: u32) -> (gc_slot_t, gc_type_t) {
-        let ty: &mut gc_type_t = &mut 0;
-        let slot = unsafe { gc_object__get_at(self.ptr, offset, ty, self.ctx) };
-        (slot, *ty)
+        let mut ty: gc_type_t = gc_type_null;
+        let slot = unsafe { gc_object__get_at(self.ptr, offset, &mut ty, self.ctx) };
+        (slot, ty)
     }
 
     pub fn get(&self, key: u32) -> Value {

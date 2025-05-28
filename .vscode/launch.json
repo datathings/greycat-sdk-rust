@@ -5,16 +5,19 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Debug run",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "/home/leiko/.greycat/bin/greycat",
+      "args": ["run"],
+      "cwd": "${workspaceFolder}/hello"
+    },
+    {
       "type": "lldb",
       "request": "launch",
       "name": "Debug unit tests in library 'greycat-sys'",
       "cargo": {
-        "args": [
-          "test",
-          "--no-run",
-          "--lib",
-          "--package=greycat-sys"
-        ],
+        "args": ["test", "--no-run", "--lib", "--package=greycat-sys"],
         "filter": {
           "name": "greycat-sys",
           "kind": "lib"
@@ -28,12 +31,7 @@
       "request": "launch",
       "name": "Debug unit tests in library 'greycat'",
       "cargo": {
-        "args": [
-          "test",
-          "--no-run",
-          "--lib",
-          "--package=greycat"
-        ],
+        "args": ["test", "--no-run", "--lib", "--package=greycat"],
         "filter": {
           "name": "greycat",
           "kind": "lib"
@@ -47,12 +45,7 @@
       "request": "launch",
       "name": "Debug unit tests in library 'greycat-sdk'",
       "cargo": {
-        "args": [
-          "test",
-          "--no-run",
-          "--lib",
-          "--package=greycat-sdk"
-        ],
+        "args": ["test", "--no-run", "--lib", "--package=greycat-sdk"],
         "filter": {
           "name": "greycat-sdk",
           "kind": "lib"
@@ -66,11 +59,7 @@
       "request": "launch",
       "name": "Debug executable 'greycat-cli'",
       "cargo": {
-        "args": [
-          "build",
-          "--bin=greycat-cli",
-          "--package=greycat-cli"
-        ],
+        "args": ["build", "--bin=greycat-cli", "--package=greycat-cli"],
         "filter": {
           "name": "greycat-cli",
           "kind": "bin"
@@ -103,11 +92,7 @@
       "request": "launch",
       "name": "Debug executable 'gabi'",
       "cargo": {
-        "args": [
-          "build",
-          "--bin=gabi",
-          "--package=greycat-cli"
-        ],
+        "args": ["build", "--bin=gabi", "--package=greycat-cli"],
         "filter": {
           "name": "gabi",
           "kind": "bin"
@@ -121,12 +106,7 @@
       "request": "launch",
       "name": "Debug unit tests in executable 'gabi'",
       "cargo": {
-        "args": [
-          "test",
-          "--no-run",
-          "--bin=gabi",
-          "--package=greycat-cli"
-        ],
+        "args": ["test", "--no-run", "--bin=gabi", "--package=greycat-cli"],
         "filter": {
           "name": "gabi",
           "kind": "bin"

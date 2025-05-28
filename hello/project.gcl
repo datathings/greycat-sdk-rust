@@ -1,0 +1,25 @@
+@library("hello");
+
+@volatile
+private type Record {
+  mandt: int;
+  id: int;
+  time: time;
+  values: Array<int>;
+}
+
+fn main() {
+  var reader = hello::CsvReader<Record> {
+    path: "/home/leiko/dev/datathings/greycat/wip/rs-sandbox/data-s.csv",
+    // format: CsvFormat { header_lines: 1 },
+  };
+
+  var start = time::now();
+  var n = 0;
+  while (reader.can_read()) {
+    var record = reader.read();
+    n = n + 1;
+    // println(record);
+  }
+  println("${n} records in ${time::now() - start}");
+}
