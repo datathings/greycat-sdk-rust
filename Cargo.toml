@@ -1,10 +1,8 @@
 [workspace]
 members = [
   "greycat-sys",
-  "greycat-sys2",
   "greycat-macro",
   "greycat",
-  "greycat2",
   "greycat-sdk",
   "greycat-cli",
   "hello",

@@ -1,21 +1,16 @@
 use std::fs::File;
 
-use greycat2::{self as gc, greycat, AsValue};
+use greycat::{self as gc, greycat, AsValue};
 
 #[greycat]
 #[repr(C)]
 pub struct CsvReader {
-    records: Option<csv::StringRecordsIntoIter<File>>,
+    records: Option<Box<csv::StringRecordsIntoIter<File>>>,
 }
 
 impl CsvReader {
-    pub fn __initialize(&mut self, _ctx: gc::Machine) {
-        std::mem::forget(self.records.take());
-        self.__initialized = true
-    }
-
-    pub fn __finalize(&mut self) {
-        let _ = self.records.take();
+    pub fn finalize(&mut self) {
+        self.records.take();
     }
 
     pub fn can_read(&mut self, ctx: gc::Machine) -> Result<bool, String> {
@@ -68,7 +63,7 @@ impl CsvReader {
             .buffer_capacity(8192)
             .from_reader(file);
         let records = reader.into_records();
-        self.records.replace(records);
+        self.records.replace(Box::new(records));
         Ok(())
     }
 }

@@ -2,8 +2,12 @@
 #![allow(non_snake_case)]
 
 use crate::hello;
-use greycat2 as gc;
-use greycat2::sys::*;
+use greycat::{self as gc, GreyCatAlloc};
+use greycat::sys::*;
+
+// Use GreyCat allocator instead of default
+#[global_allocator]
+static GLOBAL: GreyCatAlloc = GreyCatAlloc;
 
 /// # Safety
 /// This is called by GreyCat to configure the library
@@ -33,17 +37,12 @@ unsafe extern "C" fn hello_hello_CsvReader__finalize(
 ) {
     let ctx = gc::Machine::from(ptr);
     let this = &mut *(this as *mut hello::CsvReader);
-    if this.__initialized {
-        hello::CsvReader::__finalize(this)
-    }
+    hello::CsvReader::finalize(this);
 }
 
 unsafe extern "C" fn hello_hello_CsvReader__can_read(ptr: *mut gc_machine_t) {
     let ctx = gc::Machine::from(ptr);
     let this = &mut *ctx.get_self::<hello::CsvReader>();
-    if !this.__initialized {
-        hello::CsvReader::__initialize(this, ctx);
-    }
     match hello::CsvReader::can_read(this, ctx) {
         Ok(value) => ctx.set_result(value),
         Err(message) => ctx.set_error(&message),
@@ -53,9 +52,6 @@ unsafe extern "C" fn hello_hello_CsvReader__can_read(ptr: *mut gc_machine_t) {
 unsafe extern "C" fn hello_hello_CsvReader__read(ptr: *mut gc_machine_t) {
     let ctx = gc::Machine::from(ptr);
     let this = &mut *ctx.get_self::<hello::CsvReader>();
-    if !this.__initialized {
-        hello::CsvReader::__initialize(this, ctx);
-    }
     match hello::CsvReader::read(this, ctx) {
         Ok(value) => ctx.set_result(value),
         Err(message) => ctx.set_error(&message),

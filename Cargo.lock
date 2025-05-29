@@ -519,20 +519,8 @@ dependencies = [
 [[package]]
 name = "greycat-sys"
 version = "0.1.0"
-
-[[package]]
-name = "greycat-sys2"
-version = "0.1.0"
 dependencies = [
  "bindgen",
-]
-
-[[package]]
-name = "greycat2"
-version = "0.1.0"
-dependencies = [
- "greycat-macro",
- "greycat-sys2",
 ]
 
 [[package]]
@@ -571,7 +559,7 @@ name = "hello"
 version = "0.1.0"
 dependencies = [
  "csv",
- "greycat2",
+ "greycat",
 ]
 
 [[package]]

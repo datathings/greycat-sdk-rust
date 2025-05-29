@@ -2,7 +2,7 @@
 name = "greycat-sys"
 version = "0.1.0"
 edition = "2021"
+build = "build.rs"
 
-# [build-dependencies]
-# bindgen = "0.69.4"
-# home = "0.5.9"
+[build-dependencies]
+bindgen = "0.71.1"

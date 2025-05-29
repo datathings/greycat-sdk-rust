@@ -7,5 +7,5 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-greycat2 = { path = "../greycat2" }
+greycat = { path = "../greycat" }
 csv = "*"
