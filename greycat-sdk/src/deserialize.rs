@@ -207,10 +207,10 @@ where
                     load_type = byteorder::ReadBytesExt::read_u8(self)?;
                 }
                 let value = match load_type {
-                    primitive::ENUM if attr.sbi_type == primitive::UNDEFINED => {
+                    primitive::STATIC_FIELD if attr.sbi_type == primitive::UNDEFINED => {
                         Value::Enum(self.read_enum(abi)?)
                     }
-                    primitive::ENUM => {
+                    primitive::STATIC_FIELD => {
                         let ty = &abi.types[attr.abi_type];
                         let prog_ty = &abi.types[ty.mapped_abi_type_offset];
                         let offset = self.read_vu32()?;
@@ -301,9 +301,9 @@ where
             primitive::GEO => Value::Geo(self.read_geo()?),
             primitive::TIME => Value::Time(self.read_time()?),
             primitive::DURATION => Value::Duration(self.read_duration()?),
-            primitive::FN => todo!("fn ptr are not implemented yet"),
-            primitive::STR_LIT => Value::Symbol(self.read_symbol(abi)?),
-            primitive::ENUM => Value::Enum(self.read_enum(abi)?),
+            primitive::FUNCTION => todo!("fn ptr are not implemented yet"),
+            primitive::STRINGLIT => Value::Symbol(self.read_symbol(abi)?),
+            primitive::STATIC_FIELD => Value::Enum(self.read_enum(abi)?),
             primitive::OBJECT => self.read_object(abi)?,
             n => anyhow::bail!("unknown primitive type {n}"),
         };

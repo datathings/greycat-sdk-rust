@@ -1,6 +1,6 @@
 use std::fs::File;
 
-use greycat::{self as gc, greycat, AsValue};
+use greycat::{self as gc, greycat, result::Result, AsValue};
 
 #[greycat]
 #[repr(C)]
@@ -13,7 +13,7 @@ impl CsvReader {
         self.records.take();
     }
 
-    pub fn can_read(&mut self, ctx: gc::Machine) -> Result<bool, String> {
+    pub fn can_read(&mut self, ctx: gc::Machine) -> Result<bool> {
         let records = match self.records.as_ref() {
             Some(records) => records,
             None => {
@@ -24,7 +24,7 @@ impl CsvReader {
         Ok(!records.reader().is_done())
     }
 
-    pub fn read(&mut self, ctx: gc::Machine) -> Result<Option<impl AsValue>, String> {
+    pub fn read(&mut self, ctx: gc::Machine) -> Result<Option<impl AsValue>> {
         let records = match self.records.as_mut() {
             Some(records) => records,
             None => {
@@ -54,8 +54,8 @@ impl CsvReader {
         }
     }
 
-    fn initialize_reader(&mut self, ctx: gc::Machine) -> Result<(), String> {
-        let file = File::open(self.path(ctx).as_str()).map_err(|err| err.to_string())?;
+    fn initialize_reader(&mut self, ctx: gc::Machine) -> Result<()> {
+        let file = File::open(self.path(ctx).as_str())?;
         let reader = csv::ReaderBuilder::new()
             // TODO map builder options to CsvFormat
             .has_headers(true)

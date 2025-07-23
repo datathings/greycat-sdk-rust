@@ -37,7 +37,7 @@ impl serde::Serialize for GcEnum<'_> {
 
 impl AbiSerialize for GcEnum<'_> {
     fn write_to<W: Write>(&self, writer: &mut W, abi: &Abi) -> Result<usize> {
-        writer.write_u8(primitive::ENUM)?;
+        writer.write_u8(primitive::STATIC_FIELD)?;
         let mut n = writer.write_vu32(self.ty.mapped_abi_type_offset)?;
         n += self.write_raw_to(writer, abi)?;
         Ok(1 + n)

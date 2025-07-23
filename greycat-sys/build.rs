@@ -11,6 +11,7 @@ fn main() {
         .allowlist_item("gc_.*")
         .prepend_enum_name(false)
         .anon_fields_prefix("__")
+        .use_core()
         .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()))
         .generate()
         .expect("Unable to generate bindings");

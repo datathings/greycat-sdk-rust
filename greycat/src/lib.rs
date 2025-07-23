@@ -34,6 +34,10 @@ unsafe impl GlobalAlloc for GreyCatAlloc {
     }
 }
 
+pub mod result {
+    pub type Result<T, E = Box<dyn std::error::Error>> =
+        std::result::Result<T, E>;
+}
 
 #[derive(Clone, Copy, Debug)]
 #[repr(transparent)]
@@ -316,8 +320,8 @@ impl Machine {
         }
     }
 
-    pub fn set_error(&self, message: &str) {
-        let c_string = ffi::CString::new(message).expect("invalid string for C");
+    pub fn set_error(&self, message: impl AsRef<str>) {
+        let c_string = ffi::CString::new(message.as_ref()).expect("invalid string for C");
         unsafe { gc_machine__set_runtime_error(self.0, c_string.as_ptr()) };
     }
 

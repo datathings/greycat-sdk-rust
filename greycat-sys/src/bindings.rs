@@ -43,16 +43,21 @@ pub const gc_type_t2f: gc_type = 20;
 pub const gc_type_t3f: gc_type = 21;
 pub const gc_type_t4f: gc_type = 22;
 pub const gc_type_block_ref: gc_type = 23;
-pub const gc_type_function: gc_type = 24;
-pub const gc_type_undefined: gc_type = 25;
-pub const gc_type_type: gc_type = 26;
-pub const gc_type_field: gc_type = 27;
-pub const gc_type_stringlit: gc_type = 28;
-pub const gc_type_error: gc_type = 29;
+pub const gc_type_block_inline: gc_type = 24;
+pub const gc_type_function: gc_type = 25;
+pub const gc_type_undefined: gc_type = 26;
+pub const gc_type_type: gc_type = 27;
+pub const gc_type_field: gc_type = 28;
+pub const gc_type_stringlit: gc_type = 29;
+pub const gc_type_error: gc_type = 30;
 #[doc = " must fit on 8 bits !"]
-pub type gc_type = ::std::os::raw::c_uint;
+pub type gc_type = ::core::ffi::c_uint;
 #[doc = " must fit on 8 bits !"]
 pub use self::gc_type as gc_type_t;
+pub const gc_args_format_gcb: gc_args_format_t = 0;
+pub const gc_args_format_json: gc_args_format_t = 1;
+pub const gc_args_format_text: gc_args_format_t = 2;
+pub type gc_args_format_t = ::core::ffi::c_uint;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct gc_buffer {
@@ -66,6 +71,12 @@ pub struct gc_machine {
     _unused: [u8; 0],
 }
 pub type gc_machine_t = gc_machine;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct gc_host {
+    _unused: [u8; 0],
+}
+pub type gc_host_t = gc_host;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct gc_program_compiler_context {
@@ -110,12 +121,12 @@ pub struct gc_slot_tuple_u32 {
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of gc_slot_tuple_u32"][::std::mem::size_of::<gc_slot_tuple_u32>() - 8usize];
-    ["Alignment of gc_slot_tuple_u32"][::std::mem::align_of::<gc_slot_tuple_u32>() - 4usize];
+    ["Size of gc_slot_tuple_u32"][::core::mem::size_of::<gc_slot_tuple_u32>() - 8usize];
+    ["Alignment of gc_slot_tuple_u32"][::core::mem::align_of::<gc_slot_tuple_u32>() - 4usize];
     ["Offset of field: gc_slot_tuple_u32::left"]
-        [::std::mem::offset_of!(gc_slot_tuple_u32, left) - 0usize];
+        [::core::mem::offset_of!(gc_slot_tuple_u32, left) - 0usize];
     ["Offset of field: gc_slot_tuple_u32::right"]
-        [::std::mem::offset_of!(gc_slot_tuple_u32, right) - 4usize];
+        [::core::mem::offset_of!(gc_slot_tuple_u32, right) - 4usize];
 };
 pub type gc_slot_tuple_u32_t = gc_slot_tuple_u32;
 pub type gc_slot_t = gc_slot;
@@ -138,31 +149,81 @@ pub union gc_slot__bindgen_ty_1 {
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of gc_slot__bindgen_ty_1"][::std::mem::size_of::<gc_slot__bindgen_ty_1>() - 8usize];
+    ["Size of gc_slot__bindgen_ty_1"][::core::mem::size_of::<gc_slot__bindgen_ty_1>() - 8usize];
     ["Alignment of gc_slot__bindgen_ty_1"]
-        [::std::mem::align_of::<gc_slot__bindgen_ty_1>() - 8usize];
+        [::core::mem::align_of::<gc_slot__bindgen_ty_1>() - 8usize];
     ["Offset of field: gc_slot__bindgen_ty_1::b"]
-        [::std::mem::offset_of!(gc_slot__bindgen_ty_1, b) - 0usize];
+        [::core::mem::offset_of!(gc_slot__bindgen_ty_1, b) - 0usize];
     ["Offset of field: gc_slot__bindgen_ty_1::byte"]
-        [::std::mem::offset_of!(gc_slot__bindgen_ty_1, byte) - 0usize];
+        [::core::mem::offset_of!(gc_slot__bindgen_ty_1, byte) - 0usize];
     ["Offset of field: gc_slot__bindgen_ty_1::u32_"]
-        [::std::mem::offset_of!(gc_slot__bindgen_ty_1, u32_) - 0usize];
+        [::core::mem::offset_of!(gc_slot__bindgen_ty_1, u32_) - 0usize];
     ["Offset of field: gc_slot__bindgen_ty_1::i64_"]
-        [::std::mem::offset_of!(gc_slot__bindgen_ty_1, i64_) - 0usize];
+        [::core::mem::offset_of!(gc_slot__bindgen_ty_1, i64_) - 0usize];
     ["Offset of field: gc_slot__bindgen_ty_1::u64_"]
-        [::std::mem::offset_of!(gc_slot__bindgen_ty_1, u64_) - 0usize];
+        [::core::mem::offset_of!(gc_slot__bindgen_ty_1, u64_) - 0usize];
     ["Offset of field: gc_slot__bindgen_ty_1::f64_"]
-        [::std::mem::offset_of!(gc_slot__bindgen_ty_1, f64_) - 0usize];
+        [::core::mem::offset_of!(gc_slot__bindgen_ty_1, f64_) - 0usize];
     ["Offset of field: gc_slot__bindgen_ty_1::tu32"]
-        [::std::mem::offset_of!(gc_slot__bindgen_ty_1, tu32) - 0usize];
+        [::core::mem::offset_of!(gc_slot__bindgen_ty_1, tu32) - 0usize];
     ["Offset of field: gc_slot__bindgen_ty_1::object"]
-        [::std::mem::offset_of!(gc_slot__bindgen_ty_1, object) - 0usize];
+        [::core::mem::offset_of!(gc_slot__bindgen_ty_1, object) - 0usize];
 };
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of gc_slot"][::std::mem::size_of::<gc_slot>() - 8usize];
-    ["Alignment of gc_slot"][::std::mem::align_of::<gc_slot>() - 8usize];
+    ["Size of gc_slot"][::core::mem::size_of::<gc_slot>() - 8usize];
+    ["Alignment of gc_slot"][::core::mem::align_of::<gc_slot>() - 8usize];
 };
+pub const gc_task_status_empty: gc_task_status = 0;
+pub const gc_task_status_waiting: gc_task_status = 1;
+pub const gc_task_status_running: gc_task_status = 2;
+pub const gc_task_status_await: gc_task_status = 3;
+pub const gc_task_status_cancelled: gc_task_status = 4;
+pub const gc_task_status_error: gc_task_status = 5;
+pub const gc_task_status_ended: gc_task_status = 6;
+pub const gc_task_status_ended_with_errors: gc_task_status = 7;
+pub type gc_task_status = ::core::ffi::c_uint;
+pub use self::gc_task_status as gc_task_status_t;
+unsafe extern "C" {
+    pub fn gc_host__get_global() -> *mut gc_host_t;
+}
+unsafe extern "C" {
+    #[doc = " @brief Spawns a new task\n @param self\n @param fn_off the function offset in the program\n @param args_payload optional pointer to the serialized arguments of the function in bytes\n @param args_payload_len length of `args_payload` in bytes\n @param args_format format of the `args_payload` bytes\n @param user_id user id associated with the task\n @param roles_flags permission flags\n @param created_task_id the created task id (on success)\n @param extra_buffer a temp buffer used to create the file path\n @return `true` on success, `false` when the queue is full"]
+    pub fn gc_host__spawn_task_with_args(
+        self_: *mut gc_host_t,
+        fn_off: u32_t,
+        args_payload: *const ::core::ffi::c_char,
+        args_payload_len: u32_t,
+        args_format: gc_args_format_t,
+        user_id: u32_t,
+        roles_flags: u64_t,
+        created_task_id: *mut i64_t,
+        extra_buffer: *mut gc_buffer_t,
+    ) -> bool;
+}
+unsafe extern "C" {
+    #[doc = " @brief Spawns a new task\n @param self\n @param fn_off the function offset in the program\n @param user_id user id associated with the task\n @param roles_flags permission flags\n @param created_task_id the created task id (on success)\n @return `true` on success, `false` when the queue is full"]
+    pub fn gc_host__spawn_task(
+        self_: *mut gc_host_t,
+        fn_off: u32_t,
+        user_id: u32_t,
+        roles_flags: u64_t,
+        created_task_id: *mut i64_t,
+    ) -> bool;
+}
+unsafe extern "C" {
+    pub fn gc_host__cancel_task(self_: *mut gc_host_t, task_id: u32_t) -> bool;
+}
+unsafe extern "C" {
+    pub fn gc_host__get_task_status(
+        self_: *mut gc_host_t,
+        task_id: u32_t,
+        status: *mut gc_task_status_t,
+    ) -> bool;
+}
+unsafe extern "C" {
+    pub fn gc_host__program(host: *const gc_host_t) -> *const gc_program_t;
+}
 unsafe extern "C" {
     pub fn gc_machine__get_param(ctx: *const gc_machine_t, offset: u32_t) -> gc_slot_t;
 }
@@ -185,10 +246,7 @@ unsafe extern "C" {
     pub fn gc_machine__set_result(self_: *mut gc_machine_t, slot: gc_slot_t, slot_type: gc_type_t);
 }
 unsafe extern "C" {
-    pub fn gc_machine__set_runtime_error(
-        ctx: *mut gc_machine_t,
-        msg: *const ::std::os::raw::c_char,
-    );
+    pub fn gc_machine__set_runtime_error(ctx: *mut gc_machine_t, msg: *const ::core::ffi::c_char);
 }
 unsafe extern "C" {
     pub fn gc_machine__set_runtime_error_syserr(ctx: *mut gc_machine_t);
@@ -202,6 +260,9 @@ unsafe extern "C" {
 unsafe extern "C" {
     pub fn gc_machine__create_return_type_object(ctx: *mut gc_machine_t) -> *mut gc_object_t;
 }
+unsafe extern "C" {
+    pub fn gc_machine__get_host(ctx: *mut gc_machine_t) -> *mut gc_host_t;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct gc_program_symbol {
@@ -211,7 +272,15 @@ pub type gc_program_symbol_t = gc_program_symbol;
 pub type gc_core_string_t = gc_program_symbol_t;
 unsafe extern "C" {
     pub fn gc_core_string__create_from(
-        str_: *const ::std::os::raw::c_char,
+        str_: *const ::core::ffi::c_char,
+        len: u64_t,
+    ) -> *mut gc_core_string_t;
+}
+unsafe extern "C" {
+    #[doc = " Only creates a new gc_core_string_t* if not found as a literal symbol"]
+    pub fn gc_core_string__create_from_or_symbol(
+        prog: *const gc_program_t,
+        str_: *const ::core::ffi::c_char,
         len: u64_t,
     ) -> *mut gc_core_string_t;
 }
@@ -219,7 +288,7 @@ unsafe extern "C" {
     pub fn gc_core_string__create_from_buffer(buf: *const gc_buffer_t) -> *mut gc_core_string_t;
 }
 unsafe extern "C" {
-    pub fn gc_core_string__buffer(str_: *const gc_core_string_t) -> *const ::std::os::raw::c_char;
+    pub fn gc_core_string__buffer(str_: *const gc_core_string_t) -> *const ::core::ffi::c_char;
 }
 unsafe extern "C" {
     pub fn gc_core_string__size(str_: *const gc_core_string_t) -> u32_t;
@@ -286,7 +355,7 @@ unsafe extern "C" {
         self_: *mut gc_buffer_t,
         slot: gc_slot_t,
         type_: gc_type_t,
-        ctx: *const gc_machine_t,
+        prog: *const gc_program_t,
     );
 }
 unsafe extern "C" {
@@ -294,7 +363,7 @@ unsafe extern "C" {
         self_: *mut gc_buffer_t,
         slot: gc_slot_t,
         type_: gc_type_t,
-        ctx: *const gc_machine_t,
+        prog: *const gc_program_t,
     );
 }
 unsafe extern "C" {
@@ -302,24 +371,20 @@ unsafe extern "C" {
         self_: *mut gc_buffer_t,
         slot: gc_slot_t,
         type_: gc_type_t,
-        ctx: *const gc_machine_t,
+        prog: *const gc_program_t,
     );
 }
 unsafe extern "C" {
-    pub fn gc_buffer__add_str(
-        self_: *mut gc_buffer_t,
-        c: *const ::std::os::raw::c_char,
-        len: u32_t,
-    );
+    pub fn gc_buffer__add_str(self_: *mut gc_buffer_t, c: *const ::core::ffi::c_char, len: u32_t);
 }
 unsafe extern "C" {
-    pub fn gc_buffer__add_cstr(self_: *mut gc_buffer_t, c: *const ::std::os::raw::c_char);
+    pub fn gc_buffer__add_cstr(self_: *mut gc_buffer_t, c: *const ::core::ffi::c_char);
 }
 unsafe extern "C" {
-    pub fn gc_buffer__add_cstr_nul(self_: *mut gc_buffer_t, c: *const ::std::os::raw::c_char);
+    pub fn gc_buffer__add_cstr_nul(self_: *mut gc_buffer_t, c: *const ::core::ffi::c_char);
 }
 unsafe extern "C" {
-    pub fn gc_buffer__add_char(self_: *mut gc_buffer_t, c: ::std::os::raw::c_char);
+    pub fn gc_buffer__add_char(self_: *mut gc_buffer_t, c: ::core::ffi::c_char);
 }
 unsafe extern "C" {
     pub fn gc_buffer__add_path_sep(self_: *mut gc_buffer_t);
@@ -334,10 +399,16 @@ unsafe extern "C" {
     pub fn gc_buffer__prepare(self_: *mut gc_buffer_t, needed: u32_t);
 }
 unsafe extern "C" {
-    pub fn gc_buffer__data(self_: *mut gc_buffer_t) -> *mut ::std::os::raw::c_char;
+    pub fn gc_buffer__add_abi_headers(self_: *mut gc_buffer_t, prog: *const gc_program_t);
+}
+unsafe extern "C" {
+    pub fn gc_buffer__data(self_: *mut gc_buffer_t) -> *mut ::core::ffi::c_char;
 }
 unsafe extern "C" {
     pub fn gc_buffer__size(self_: *mut gc_buffer_t) -> u32_t;
+}
+unsafe extern "C" {
+    pub fn gc_buffer__capacity(self_: *mut gc_buffer_t) -> u32_t;
 }
 unsafe extern "C" {
     pub fn gc_buffer__add_size(self_: *mut gc_buffer_t, size_inc: i32_t);
@@ -445,7 +516,7 @@ unsafe extern "C" {
     #[doc = " Json"]
     pub fn gc_json__parse(
         ctx: *mut gc_machine_t,
-        str_: *mut ::std::os::raw::c_char,
+        str_: *mut ::core::ffi::c_char,
         str_len: u32_t,
         result: *mut gc_slot_t,
         result_type: *mut gc_type_t,
@@ -549,7 +620,7 @@ unsafe extern "C" {
     );
 }
 unsafe extern "C" {
-    pub fn gc_core_tensor__print(self_: *mut gc_core_tensor_t, name: *const ::std::os::raw::c_char);
+    pub fn gc_core_tensor__print(self_: *mut gc_core_tensor_t, name: *const ::core::ffi::c_char);
 }
 unsafe extern "C" {
     pub fn gc_core_tensor__get_1d_i64(
@@ -1176,7 +1247,7 @@ unsafe extern "C" {
     ) -> c128_t;
 }
 unsafe extern "C" {
-    pub fn gc_core_tensor__get_data(t: *mut gc_core_tensor_t) -> *mut ::std::os::raw::c_char;
+    pub fn gc_core_tensor__get_data(t: *mut gc_core_tensor_t) -> *mut ::core::ffi::c_char;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -1192,23 +1263,23 @@ pub struct gc_core_tensor_descriptor {
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
     ["Size of gc_core_tensor_descriptor"]
-        [::std::mem::size_of::<gc_core_tensor_descriptor>() - 88usize];
+        [::core::mem::size_of::<gc_core_tensor_descriptor>() - 88usize];
     ["Alignment of gc_core_tensor_descriptor"]
-        [::std::mem::align_of::<gc_core_tensor_descriptor>() - 8usize];
+        [::core::mem::align_of::<gc_core_tensor_descriptor>() - 8usize];
     ["Offset of field: gc_core_tensor_descriptor::dim"]
-        [::std::mem::offset_of!(gc_core_tensor_descriptor, dim) - 0usize];
+        [::core::mem::offset_of!(gc_core_tensor_descriptor, dim) - 0usize];
     ["Offset of field: gc_core_tensor_descriptor::nb_dim"]
-        [::std::mem::offset_of!(gc_core_tensor_descriptor, nb_dim) - 64usize];
+        [::core::mem::offset_of!(gc_core_tensor_descriptor, nb_dim) - 64usize];
     ["Offset of field: gc_core_tensor_descriptor::batch_dim"]
-        [::std::mem::offset_of!(gc_core_tensor_descriptor, batch_dim) - 65usize];
+        [::core::mem::offset_of!(gc_core_tensor_descriptor, batch_dim) - 65usize];
     ["Offset of field: gc_core_tensor_descriptor::type_"]
-        [::std::mem::offset_of!(gc_core_tensor_descriptor, type_) - 66usize];
+        [::core::mem::offset_of!(gc_core_tensor_descriptor, type_) - 66usize];
     ["Offset of field: gc_core_tensor_descriptor::nature"]
-        [::std::mem::offset_of!(gc_core_tensor_descriptor, nature) - 67usize];
+        [::core::mem::offset_of!(gc_core_tensor_descriptor, nature) - 67usize];
     ["Offset of field: gc_core_tensor_descriptor::size"]
-        [::std::mem::offset_of!(gc_core_tensor_descriptor, size) - 72usize];
+        [::core::mem::offset_of!(gc_core_tensor_descriptor, size) - 72usize];
     ["Offset of field: gc_core_tensor_descriptor::capacity"]
-        [::std::mem::offset_of!(gc_core_tensor_descriptor, capacity) - 80usize];
+        [::core::mem::offset_of!(gc_core_tensor_descriptor, capacity) - 80usize];
 };
 pub type gc_core_tensor_descriptor_t = gc_core_tensor_descriptor;
 unsafe extern "C" {
@@ -1359,11 +1430,11 @@ unsafe extern "C" {
         index: *const i64_t,
     ) -> i64_t;
 }
-pub type gc_hook_function_t = ::std::option::Option<
+pub type gc_hook_function_t = ::core::option::Option<
     unsafe extern "C" fn(
         lib: *mut gc_program_library_t,
         prog: *mut gc_program_t,
-        user_data: *mut *mut ::std::os::raw::c_void,
+        user_data: *mut *mut ::core::ffi::c_void,
     ) -> bool,
 >;
 unsafe extern "C" {
@@ -1381,7 +1452,7 @@ unsafe extern "C" {
     );
 }
 pub type gc_object_type_native_finalize_t =
-    ::std::option::Option<unsafe extern "C" fn(self_: *mut gc_object_t, ctx: *mut gc_machine_t)>;
+    ::core::option::Option<unsafe extern "C" fn(self_: *mut gc_object_t, ctx: *mut gc_machine_t)>;
 unsafe extern "C" {
     pub fn gc_program_type__configure(
         prog: *mut gc_program_t,
@@ -1394,28 +1465,25 @@ unsafe extern "C" {
     pub fn gc_program_type__abi_type_id(prog: *const gc_program_t, type_id: u32_t) -> u32_t;
 }
 unsafe extern "C" {
-    pub fn gc_common__parse_number(
-        str_: *const ::std::os::raw::c_char,
-        str_len: *mut u32_t,
-    ) -> u64_t;
+    pub fn gc_common__parse_number(str_: *const ::core::ffi::c_char, str_len: *mut u32_t) -> u64_t;
 }
 unsafe extern "C" {
     pub fn gc_common__parse_sign_number(
-        str_: *const ::std::os::raw::c_char,
+        str_: *const ::core::ffi::c_char,
         str_len: *mut u32_t,
     ) -> i64_t;
 }
 unsafe extern "C" {
     pub fn gc_common__parse_date_iso8601(
-        data: *mut ::std::os::raw::c_char,
+        data: *mut ::core::ffi::c_char,
         data_len: u32_t,
         epoch_utc: *mut i64_t,
     ) -> bool;
 }
 unsafe extern "C" {
     pub fn gc_common_strncmp_ignore_case(
-        str1: *const ::std::os::raw::c_char,
-        str2: *const ::std::os::raw::c_char,
+        str1: *const ::core::ffi::c_char,
+        str2: *const ::core::ffi::c_char,
         str_len: u32_t,
     ) -> u8_t;
 }
@@ -1428,50 +1496,59 @@ pub struct gc_object {
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of gc_object"][::std::mem::size_of::<gc_object>() - 16usize];
-    ["Alignment of gc_object"][::std::mem::align_of::<gc_object>() - 8usize];
-    ["Offset of field: gc_object::block"][::std::mem::offset_of!(gc_object, block) - 0usize];
-    ["Offset of field: gc_object::marks"][::std::mem::offset_of!(gc_object, marks) - 8usize];
-    ["Offset of field: gc_object::type_id"][::std::mem::offset_of!(gc_object, type_id) - 12usize];
+    ["Size of gc_object"][::core::mem::size_of::<gc_object>() - 16usize];
+    ["Alignment of gc_object"][::core::mem::align_of::<gc_object>() - 8usize];
+    ["Offset of field: gc_object::block"][::core::mem::offset_of!(gc_object, block) - 0usize];
+    ["Offset of field: gc_object::marks"][::core::mem::offset_of!(gc_object, marks) - 8usize];
+    ["Offset of field: gc_object::type_id"][::core::mem::offset_of!(gc_object, type_id) - 12usize];
 };
 unsafe extern "C" {
-    pub fn gc_malloc(size: usize) -> *mut ::std::os::raw::c_void;
+    pub fn gc_malloc(size: usize) -> *mut ::core::ffi::c_void;
 }
 unsafe extern "C" {
-    pub fn gc_free(ptr: *mut ::std::os::raw::c_void, size: usize);
+    pub fn gc_free(ptr: *mut ::core::ffi::c_void, size: usize);
 }
 unsafe extern "C" {
-    pub fn gc_aligned_free(ptr: *mut ::std::os::raw::c_void);
+    pub fn gc_aligned_free(ptr: *mut ::core::ffi::c_void);
 }
 unsafe extern "C" {
-    pub fn gc_align_malloc(size: usize, block_size: usize) -> *mut ::std::os::raw::c_void;
+    pub fn gc_align_malloc(size: usize, block_size: usize) -> *mut ::core::ffi::c_void;
 }
 unsafe extern "C" {
-    pub fn gc_gnu_malloc(size: usize) -> *mut ::std::os::raw::c_void;
+    pub fn gc_gnu_malloc(size: usize) -> *mut ::core::ffi::c_void;
 }
 unsafe extern "C" {
-    pub fn gc_gnu_free(ptr: *mut ::std::os::raw::c_void);
+    pub fn gc_gnu_free(ptr: *mut ::core::ffi::c_void);
 }
 unsafe extern "C" {
-    pub fn gc_gnu_calloc(count: usize, size: usize) -> *mut ::std::os::raw::c_void;
+    pub fn gc_gnu_calloc(count: usize, size: usize) -> *mut ::core::ffi::c_void;
 }
 unsafe extern "C" {
     pub fn gc_gnu_realloc(
-        ptr: *mut ::std::os::raw::c_void,
+        ptr: *mut ::core::ffi::c_void,
         new_size: usize,
-    ) -> *mut ::std::os::raw::c_void;
+    ) -> *mut ::core::ffi::c_void;
 }
 unsafe extern "C" {
-    pub fn gc_gnu_alloc_size(ptr: *mut ::std::os::raw::c_void) -> usize;
+    pub fn gc_gnu_alloc_size(ptr: *mut ::core::ffi::c_void) -> usize;
 }
 unsafe extern "C" {
-    pub fn gc_global_gnu_malloc(size: usize) -> *mut ::std::os::raw::c_void;
+    pub fn gc_global_gnu_malloc(size: usize) -> *mut ::core::ffi::c_void;
 }
 unsafe extern "C" {
-    pub fn gc_global_gnu_free(ptr: *mut ::std::os::raw::c_void);
+    pub fn gc_global_gnu_calloc(count: usize, size: usize) -> *mut ::core::ffi::c_void;
 }
 unsafe extern "C" {
-    pub fn gc_mbedtls_ssl_config() -> *mut ::std::os::raw::c_void;
+    pub fn gc_global_gnu_realloc(
+        ptr: *mut ::core::ffi::c_void,
+        new_size: usize,
+    ) -> *mut ::core::ffi::c_void;
+}
+unsafe extern "C" {
+    pub fn gc_global_gnu_free(ptr: *mut ::core::ffi::c_void);
+}
+unsafe extern "C" {
+    pub fn gc_mbedtls_ssl_config() -> *mut ::core::ffi::c_void;
 }
 unsafe extern "C" {
     pub fn gc_common__current_us() -> i64_t;
@@ -1482,7 +1559,7 @@ pub const gc_log_level_warn: gc_log_level = 2;
 pub const gc_log_level_info: gc_log_level = 3;
 pub const gc_log_level_perf: gc_log_level = 4;
 pub const gc_log_level_trace: gc_log_level = 5;
-pub type gc_log_level = ::std::os::raw::c_uint;
+pub type gc_log_level = ::core::ffi::c_uint;
 pub use self::gc_log_level as gc_log_level_t;
 unsafe extern "C" {
     pub fn gc_machine__log_level(ctx: *mut gc_machine_t) -> gc_log_level_t;
@@ -1491,7 +1568,7 @@ pub const gc_license_level_community: gc_license_level = 0;
 pub const gc_license_level_pro: gc_license_level = 1;
 pub const gc_license_level_server: gc_license_level = 2;
 pub const gc_license_level_platform: gc_license_level = 3;
-pub type gc_license_level = ::std::os::raw::c_uint;
+pub type gc_license_level = ::core::ffi::c_uint;
 pub use self::gc_license_level as gc_license_level_t;
 unsafe extern "C" {
     pub fn gc_license__level() -> gc_license_level_t;
@@ -1508,7 +1585,7 @@ unsafe extern "C" {
 unsafe extern "C" {
     pub fn gc_server__add_request(
         fn_: u32_t,
-        data: *mut ::std::os::raw::c_char,
+        data: *mut ::core::ffi::c_char,
         data_len: u32_t,
     ) -> bool;
 }
@@ -1520,18 +1597,18 @@ pub const gc_http_method_delete: gc_http_method = 4;
 pub const gc_http_method_connect: gc_http_method = 5;
 pub const gc_http_method_options: gc_http_method = 6;
 pub const gc_http_method_trace: gc_http_method = 7;
-pub type gc_http_method = ::std::os::raw::c_uint;
+pub type gc_http_method = ::core::ffi::c_uint;
 pub use self::gc_http_method as gc_http_method_t;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct gc_http_request {
     pub method: gc_http_method_t,
     pub port: i32_t,
-    pub host: *const ::std::os::raw::c_char,
+    pub host: *const ::core::ffi::c_char,
     pub host_len: u32_t,
-    pub path: *const ::std::os::raw::c_char,
+    pub path: *const ::core::ffi::c_char,
     pub path_len: u32_t,
-    pub params: *const ::std::os::raw::c_char,
+    pub params: *const ::core::ffi::c_char,
     pub params_len: u32_t,
     pub headers: *const gc_core_array_t,
     pub in_fd: i32_t,
@@ -1545,48 +1622,48 @@ pub struct gc_http_request {
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of gc_http_request"][::std::mem::size_of::<gc_http_request>() - 112usize];
-    ["Alignment of gc_http_request"][::std::mem::align_of::<gc_http_request>() - 8usize];
+    ["Size of gc_http_request"][::core::mem::size_of::<gc_http_request>() - 112usize];
+    ["Alignment of gc_http_request"][::core::mem::align_of::<gc_http_request>() - 8usize];
     ["Offset of field: gc_http_request::method"]
-        [::std::mem::offset_of!(gc_http_request, method) - 0usize];
+        [::core::mem::offset_of!(gc_http_request, method) - 0usize];
     ["Offset of field: gc_http_request::port"]
-        [::std::mem::offset_of!(gc_http_request, port) - 4usize];
+        [::core::mem::offset_of!(gc_http_request, port) - 4usize];
     ["Offset of field: gc_http_request::host"]
-        [::std::mem::offset_of!(gc_http_request, host) - 8usize];
+        [::core::mem::offset_of!(gc_http_request, host) - 8usize];
     ["Offset of field: gc_http_request::host_len"]
-        [::std::mem::offset_of!(gc_http_request, host_len) - 16usize];
+        [::core::mem::offset_of!(gc_http_request, host_len) - 16usize];
     ["Offset of field: gc_http_request::path"]
-        [::std::mem::offset_of!(gc_http_request, path) - 24usize];
+        [::core::mem::offset_of!(gc_http_request, path) - 24usize];
     ["Offset of field: gc_http_request::path_len"]
-        [::std::mem::offset_of!(gc_http_request, path_len) - 32usize];
+        [::core::mem::offset_of!(gc_http_request, path_len) - 32usize];
     ["Offset of field: gc_http_request::params"]
-        [::std::mem::offset_of!(gc_http_request, params) - 40usize];
+        [::core::mem::offset_of!(gc_http_request, params) - 40usize];
     ["Offset of field: gc_http_request::params_len"]
-        [::std::mem::offset_of!(gc_http_request, params_len) - 48usize];
+        [::core::mem::offset_of!(gc_http_request, params_len) - 48usize];
     ["Offset of field: gc_http_request::headers"]
-        [::std::mem::offset_of!(gc_http_request, headers) - 56usize];
+        [::core::mem::offset_of!(gc_http_request, headers) - 56usize];
     ["Offset of field: gc_http_request::in_fd"]
-        [::std::mem::offset_of!(gc_http_request, in_fd) - 64usize];
+        [::core::mem::offset_of!(gc_http_request, in_fd) - 64usize];
     ["Offset of field: gc_http_request::in_buf"]
-        [::std::mem::offset_of!(gc_http_request, in_buf) - 72usize];
+        [::core::mem::offset_of!(gc_http_request, in_buf) - 72usize];
     ["Offset of field: gc_http_request::param_type"]
-        [::std::mem::offset_of!(gc_http_request, param_type) - 80usize];
+        [::core::mem::offset_of!(gc_http_request, param_type) - 80usize];
     ["Offset of field: gc_http_request::param"]
-        [::std::mem::offset_of!(gc_http_request, param) - 88usize];
+        [::core::mem::offset_of!(gc_http_request, param) - 88usize];
     ["Offset of field: gc_http_request::out_fd"]
-        [::std::mem::offset_of!(gc_http_request, out_fd) - 96usize];
+        [::core::mem::offset_of!(gc_http_request, out_fd) - 96usize];
     ["Offset of field: gc_http_request::out_buf_offset"]
-        [::std::mem::offset_of!(gc_http_request, out_buf_offset) - 100usize];
+        [::core::mem::offset_of!(gc_http_request, out_buf_offset) - 100usize];
     ["Offset of field: gc_http_request::use_ssl"]
-        [::std::mem::offset_of!(gc_http_request, use_ssl) - 104usize];
+        [::core::mem::offset_of!(gc_http_request, use_ssl) - 104usize];
     ["Offset of field: gc_http_request::http_code"]
-        [::std::mem::offset_of!(gc_http_request, http_code) - 108usize];
+        [::core::mem::offset_of!(gc_http_request, http_code) - 108usize];
 };
 pub type gc_http_request_t = gc_http_request;
 unsafe extern "C" {
     pub fn gc_http_url__parse(
         req: *mut gc_http_request_t,
-        url: *const ::std::os::raw::c_char,
+        url: *const ::core::ffi::c_char,
         url_len: u32_t,
     );
 }
@@ -1632,25 +1709,16 @@ unsafe extern "C" {
     pub fn gc_machine__init_tensor(
         desc: gc_core_tensor_descriptor_t,
         proxy: *mut gc_object_t,
-        data: *mut ::std::os::raw::c_char,
+        data: *mut ::core::ffi::c_char,
         ctx: *const gc_machine_t,
     ) -> *mut gc_core_tensor_t;
-}
-unsafe extern "C" {
-    pub fn gc_program__get_symbol(
-        program: *const gc_program_t,
-        symb_off: u32_t,
-    ) -> *mut gc_program_symbol_t;
-}
-unsafe extern "C" {
-    pub fn gc_program__get_symbol_off(symb: *const gc_program_symbol_t) -> u32_t;
 }
 unsafe extern "C" {
     pub fn gc_io_open(path: *const gc_core_string_t, flags: i32_t, ctx: *mut gc_machine_t)
         -> i32_t;
 }
 pub type gc_program_function_body_t =
-    ::std::option::Option<unsafe extern "C" fn(ctx: *mut gc_machine_t)>;
+    ::core::option::Option<unsafe extern "C" fn(ctx: *mut gc_machine_t)>;
 unsafe extern "C" {
     pub fn gc_program__link_mod_fn(
         prg: *const gc_program_t,
@@ -1700,9 +1768,18 @@ unsafe extern "C" {
         -> u32_t;
 }
 unsafe extern "C" {
+    pub fn gc_program__get_symbol(
+        program: *const gc_program_t,
+        symb_off: u32_t,
+    ) -> *mut gc_program_symbol_t;
+}
+unsafe extern "C" {
+    pub fn gc_program__get_symbol_off(symb: *const gc_program_symbol_t) -> u32_t;
+}
+unsafe extern "C" {
     pub fn gc_program__resolve_symbol(
         program: *const gc_program_t,
-        str_: *const ::std::os::raw::c_char,
+        str_: *const ::core::ffi::c_char,
         len: u32_t,
     ) -> u32_t;
 }
@@ -1792,7 +1869,7 @@ unsafe extern "C" {
 unsafe extern "C" {
     pub fn gc_machine__load(
         ctx: *mut gc_machine_t,
-        data: *mut ::std::os::raw::c_char,
+        data: *mut ::core::ffi::c_char,
         len: u32_t,
         value: *mut gc_slot_t,
     ) -> gc_type_t;
@@ -1806,24 +1883,24 @@ pub struct gc_crypto_sha256 {
 #[derive(Copy, Clone)]
 pub union gc_crypto_sha256__bindgen_ty_1 {
     pub u32_: [u32_t; 8usize],
-    pub u8_: [::std::os::raw::c_uchar; 32usize],
+    pub u8_: [::core::ffi::c_uchar; 32usize],
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
     ["Size of gc_crypto_sha256__bindgen_ty_1"]
-        [::std::mem::size_of::<gc_crypto_sha256__bindgen_ty_1>() - 32usize];
+        [::core::mem::size_of::<gc_crypto_sha256__bindgen_ty_1>() - 32usize];
     ["Alignment of gc_crypto_sha256__bindgen_ty_1"]
-        [::std::mem::align_of::<gc_crypto_sha256__bindgen_ty_1>() - 4usize];
+        [::core::mem::align_of::<gc_crypto_sha256__bindgen_ty_1>() - 4usize];
     ["Offset of field: gc_crypto_sha256__bindgen_ty_1::u32_"]
-        [::std::mem::offset_of!(gc_crypto_sha256__bindgen_ty_1, u32_) - 0usize];
+        [::core::mem::offset_of!(gc_crypto_sha256__bindgen_ty_1, u32_) - 0usize];
     ["Offset of field: gc_crypto_sha256__bindgen_ty_1::u8_"]
-        [::std::mem::offset_of!(gc_crypto_sha256__bindgen_ty_1, u8_) - 0usize];
+        [::core::mem::offset_of!(gc_crypto_sha256__bindgen_ty_1, u8_) - 0usize];
 };
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of gc_crypto_sha256"][::std::mem::size_of::<gc_crypto_sha256>() - 32usize];
-    ["Alignment of gc_crypto_sha256"][::std::mem::align_of::<gc_crypto_sha256>() - 4usize];
-    ["Offset of field: gc_crypto_sha256::u"][::std::mem::offset_of!(gc_crypto_sha256, u) - 0usize];
+    ["Size of gc_crypto_sha256"][::core::mem::size_of::<gc_crypto_sha256>() - 32usize];
+    ["Alignment of gc_crypto_sha256"][::core::mem::align_of::<gc_crypto_sha256>() - 4usize];
+    ["Offset of field: gc_crypto_sha256::u"][::core::mem::offset_of!(gc_crypto_sha256, u) - 0usize];
 };
 pub type gc_crypto_sha256_t = gc_crypto_sha256;
 #[repr(C)]
@@ -1837,30 +1914,30 @@ pub struct gc_crypto_sha256_ctx_t {
 #[derive(Copy, Clone)]
 pub union gc_crypto_sha256_ctx_t__bindgen_ty_1 {
     pub u32_: [u32_t; 16usize],
-    pub u8_: [::std::os::raw::c_uchar; 64usize],
+    pub u8_: [::core::ffi::c_uchar; 64usize],
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
     ["Size of gc_crypto_sha256_ctx_t__bindgen_ty_1"]
-        [::std::mem::size_of::<gc_crypto_sha256_ctx_t__bindgen_ty_1>() - 64usize];
+        [::core::mem::size_of::<gc_crypto_sha256_ctx_t__bindgen_ty_1>() - 64usize];
     ["Alignment of gc_crypto_sha256_ctx_t__bindgen_ty_1"]
-        [::std::mem::align_of::<gc_crypto_sha256_ctx_t__bindgen_ty_1>() - 4usize];
+        [::core::mem::align_of::<gc_crypto_sha256_ctx_t__bindgen_ty_1>() - 4usize];
     ["Offset of field: gc_crypto_sha256_ctx_t__bindgen_ty_1::u32_"]
-        [::std::mem::offset_of!(gc_crypto_sha256_ctx_t__bindgen_ty_1, u32_) - 0usize];
+        [::core::mem::offset_of!(gc_crypto_sha256_ctx_t__bindgen_ty_1, u32_) - 0usize];
     ["Offset of field: gc_crypto_sha256_ctx_t__bindgen_ty_1::u8_"]
-        [::std::mem::offset_of!(gc_crypto_sha256_ctx_t__bindgen_ty_1, u8_) - 0usize];
+        [::core::mem::offset_of!(gc_crypto_sha256_ctx_t__bindgen_ty_1, u8_) - 0usize];
 };
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of gc_crypto_sha256_ctx_t"][::std::mem::size_of::<gc_crypto_sha256_ctx_t>() - 104usize];
+    ["Size of gc_crypto_sha256_ctx_t"][::core::mem::size_of::<gc_crypto_sha256_ctx_t>() - 104usize];
     ["Alignment of gc_crypto_sha256_ctx_t"]
-        [::std::mem::align_of::<gc_crypto_sha256_ctx_t>() - 8usize];
+        [::core::mem::align_of::<gc_crypto_sha256_ctx_t>() - 8usize];
     ["Offset of field: gc_crypto_sha256_ctx_t::s"]
-        [::std::mem::offset_of!(gc_crypto_sha256_ctx_t, s) - 0usize];
+        [::core::mem::offset_of!(gc_crypto_sha256_ctx_t, s) - 0usize];
     ["Offset of field: gc_crypto_sha256_ctx_t::buf"]
-        [::std::mem::offset_of!(gc_crypto_sha256_ctx_t, buf) - 32usize];
+        [::core::mem::offset_of!(gc_crypto_sha256_ctx_t, buf) - 32usize];
     ["Offset of field: gc_crypto_sha256_ctx_t::bytes"]
-        [::std::mem::offset_of!(gc_crypto_sha256_ctx_t, bytes) - 96usize];
+        [::core::mem::offset_of!(gc_crypto_sha256_ctx_t, bytes) - 96usize];
 };
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -1869,11 +1946,11 @@ pub struct gc_crypto_hmac_sha256 {
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of gc_crypto_hmac_sha256"][::std::mem::size_of::<gc_crypto_hmac_sha256>() - 32usize];
+    ["Size of gc_crypto_hmac_sha256"][::core::mem::size_of::<gc_crypto_hmac_sha256>() - 32usize];
     ["Alignment of gc_crypto_hmac_sha256"]
-        [::std::mem::align_of::<gc_crypto_hmac_sha256>() - 4usize];
+        [::core::mem::align_of::<gc_crypto_hmac_sha256>() - 4usize];
     ["Offset of field: gc_crypto_hmac_sha256::sha"]
-        [::std::mem::offset_of!(gc_crypto_hmac_sha256, sha) - 0usize];
+        [::core::mem::offset_of!(gc_crypto_hmac_sha256, sha) - 0usize];
 };
 pub type gc_crypto_hmac_sha256_t = gc_crypto_hmac_sha256;
 #[repr(C)]
@@ -1885,36 +1962,36 @@ pub struct gc_crypto_hmac_sha256_ctx {
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
     ["Size of gc_crypto_hmac_sha256_ctx"]
-        [::std::mem::size_of::<gc_crypto_hmac_sha256_ctx>() - 168usize];
+        [::core::mem::size_of::<gc_crypto_hmac_sha256_ctx>() - 168usize];
     ["Alignment of gc_crypto_hmac_sha256_ctx"]
-        [::std::mem::align_of::<gc_crypto_hmac_sha256_ctx>() - 8usize];
+        [::core::mem::align_of::<gc_crypto_hmac_sha256_ctx>() - 8usize];
     ["Offset of field: gc_crypto_hmac_sha256_ctx::sha"]
-        [::std::mem::offset_of!(gc_crypto_hmac_sha256_ctx, sha) - 0usize];
+        [::core::mem::offset_of!(gc_crypto_hmac_sha256_ctx, sha) - 0usize];
     ["Offset of field: gc_crypto_hmac_sha256_ctx::k_opad"]
-        [::std::mem::offset_of!(gc_crypto_hmac_sha256_ctx, k_opad) - 104usize];
+        [::core::mem::offset_of!(gc_crypto_hmac_sha256_ctx, k_opad) - 104usize];
 };
 pub type gc_crypto_hmac_sha256_ctx_t = gc_crypto_hmac_sha256_ctx;
 unsafe extern "C" {
     pub fn gc_crypto_hmac_sha256(
         ctx: *mut gc_crypto_hmac_sha256_ctx_t,
         hmac: *mut gc_crypto_hmac_sha256_t,
-        k: *const ::std::os::raw::c_void,
+        k: *const ::core::ffi::c_void,
         ksize: usize,
-        d: *const ::std::os::raw::c_void,
+        d: *const ::core::ffi::c_void,
         dsize: usize,
     );
 }
 unsafe extern "C" {
     pub fn gc_crypto_sha256(
         sha: *mut gc_crypto_sha256_t,
-        p: *const ::std::os::raw::c_void,
+        p: *const ::core::ffi::c_void,
         size: usize,
     );
 }
 unsafe extern "C" {
     pub fn gc_common__hex2bin(
-        dest: *mut ::std::os::raw::c_char,
-        src: *const ::std::os::raw::c_char,
+        dest: *mut ::core::ffi::c_char,
+        src: *const ::core::ffi::c_char,
         len: u32_t,
     ) -> bool;
 }
@@ -1923,8 +2000,8 @@ unsafe extern "C" {
 }
 unsafe extern "C" {
     pub fn gc_common__bin2hex(
-        dest: *mut ::std::os::raw::c_char,
-        src: *const ::std::os::raw::c_char,
+        dest: *mut ::core::ffi::c_char,
+        src: *const ::core::ffi::c_char,
         len: u32_t,
     );
 }

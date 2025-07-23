@@ -45,7 +45,7 @@ unsafe extern "C" fn hello_hello_CsvReader__can_read(ptr: *mut gc_machine_t) {
     let this = &mut *ctx.get_self::<hello::CsvReader>();
     match hello::CsvReader::can_read(this, ctx) {
         Ok(value) => ctx.set_result(value),
-        Err(message) => ctx.set_error(&message),
+        Err(message) => ctx.set_error(message.to_string()),
     }
 }
 
@@ -54,7 +54,7 @@ unsafe extern "C" fn hello_hello_CsvReader__read(ptr: *mut gc_machine_t) {
     let this = &mut *ctx.get_self::<hello::CsvReader>();
     match hello::CsvReader::read(this, ctx) {
         Ok(value) => ctx.set_result(value),
-        Err(message) => ctx.set_error(&message),
+        Err(message) => ctx.set_error(message.to_string()),
     }
 }
 

@@ -242,7 +242,7 @@ pub struct AbiSymbol<'abi>(pub &'abi str);
 impl AbiSerialize for AbiSymbol<'_> {
     #[inline]
     fn write_to<W: Write>(&self, writer: &mut W, abi: &Abi) -> Result<usize> {
-        writer.write_u8(crate::primitive::STR_LIT)?;
+        writer.write_u8(crate::primitive::STRINGLIT)?;
         let n = self.write_raw_to(writer, abi)?;
         Ok(1 + n)
     }
