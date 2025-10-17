@@ -1,4 +1,4 @@
-@library("hello");
+@library("csv2");
 
 @volatile
 private type Record {
@@ -9,8 +9,8 @@ private type Record {
 }
 
 fn main() {
-  var reader = hello::CsvReader<Record> {
-    path: "/home/leiko/dev/datathings/greycat/wip/rs-sandbox/data-s.csv",
+  var reader = csv2::CsvReader<Record> {
+    path: "/path/to/file.csv",
     // format: CsvFormat { header_lines: 1 },
   };
 

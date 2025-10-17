@@ -1,0 +1,8 @@
+@library("simple");
+
+fn main() {
+    println("sum(40, 2) = ${sum(40, 2)}");
+    println("sub(44, 2) = ${sub(44, 2)}");
+    println("DoubleInputCalc::sum(40, 2) = ${DoubleInputCalc { a: 40, b: 2 }.sum()}");
+    println("DoubleInputCalc::sub(44, 2) = ${DoubleInputCalc { a: 44, b: 2 }.sub()}");
+}

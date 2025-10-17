@@ -1,5 +1,4 @@
 /target
 /files
-/gcdata
-/*/files
-/*/gcdata
+/**/files
+/**/gcdata

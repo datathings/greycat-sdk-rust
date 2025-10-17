@@ -10,7 +10,7 @@
       "request": "launch",
       "program": "/home/leiko/.greycat/bin/greycat",
       "args": ["run"],
-      "cwd": "${workspaceFolder}/hello"
+      "cwd": "${workspaceFolder}/examples/simple"
     },
     {
       "type": "lldb",

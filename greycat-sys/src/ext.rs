@@ -32,6 +32,16 @@ impl gc_slot_t {
     }
 
     #[inline(always)]
+    pub fn char(c: char) -> Self {
+        let [b0, b1, b2, b3] = (c as u32).to_le_bytes();
+        Self {
+            __1: gc_slot__bindgen_ty_1 {
+                byte: [b0, b1, b2, b3, 0, 0, 0, 0],
+            },
+        }
+    }
+
+    #[inline(always)]
     pub fn i64(i64: i64) -> Self {
         Self {
             __1: gc_slot__bindgen_ty_1 { i64_: i64 },
@@ -46,9 +56,11 @@ impl gc_slot_t {
     }
 
     #[inline(always)]
-    pub fn tu32(tu32: gc_slot_tuple_u32_t) -> Self {
+    pub fn tu32(left: u32, right: u32) -> Self {
         Self {
-            __1: gc_slot__bindgen_ty_1 { tu32 },
+            __1: gc_slot__bindgen_ty_1 {
+                tu32: gc_slot_tuple_u32 { left, right },
+            },
         }
     }
 

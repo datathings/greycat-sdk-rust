@@ -6,7 +6,7 @@ use crate::abi::{Abi, AbiType};
 use crate::value::Value;
 
 pub trait TypeLoader {
-    fn load(&mut self, ty: Rc<AbiType>, abi: &Abi) -> Result<Value>;
+    fn load(&mut self, ty: Rc<AbiType>, abi: &Abi) -> Result<Value<'_>>;
 }
 
 pub trait TypeFactory {

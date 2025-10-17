@@ -116,11 +116,11 @@ impl Abi {
         self.symbols.id_by_name.get(value).copied()
     }
 
-    pub fn get_symbol_by_id(&self, id: u32) -> AbiSymbol {
+    pub fn get_symbol_by_id(&self, id: u32) -> AbiSymbol<'_> {
         AbiSymbol(&self.symbols[id])
     }
 
-    pub fn get_symbol(&self, str: &str) -> Option<AbiSymbol> {
+    pub fn get_symbol(&self, str: &str) -> Option<AbiSymbol<'_>> {
         self.symbols
             .id_by_name
             .get(str)

@@ -1,19 +1,18 @@
 use std::fs::File;
 
-use greycat::{self as gc, greycat, result::Result, AsValue};
+use greycat::prelude::*;
 
-#[greycat]
-#[repr(C)]
+#[greycat_object]
 pub struct CsvReader {
     records: Option<Box<csv::StringRecordsIntoIter<File>>>,
 }
 
 impl CsvReader {
-    pub fn finalize(&mut self) {
+    pub fn finalize(&mut self, _: GcMachine) {
         self.records.take();
     }
 
-    pub fn can_read(&mut self, ctx: gc::Machine) -> Result<bool> {
+    pub fn can_read(&mut self, ctx: GcMachine) -> GcResult<bool> {
         let records = match self.records.as_ref() {
             Some(records) => records,
             None => {
@@ -24,7 +23,7 @@ impl CsvReader {
         Ok(!records.reader().is_done())
     }
 
-    pub fn read(&mut self, ctx: gc::Machine) -> Result<Option<impl AsValue>> {
+    pub fn read(&mut self, ctx: GcMachine) -> GcResult<Option<impl AsGcValue>> {
         let records = match self.records.as_mut() {
             Some(records) => records,
             None => {
@@ -35,8 +34,8 @@ impl CsvReader {
 
         match records.next() {
             Some(record) => {
-                let record = record.map_err(|err| err.to_string())?;
-                let mut row = gc::Array::new(ctx);
+                let record = record?;
+                let mut row = GcArray::new(ctx);
                 for field in record.iter() {
                     if let Ok(value) = field.parse::<i64>() {
                         row.add(value, ctx);
@@ -50,11 +49,11 @@ impl CsvReader {
                 }
                 Ok(Some(row))
             }
-            None => Ok(Option::<gc::Array>::None),
+            None => Ok(Option::<GcArray>::None),
         }
     }
 
-    fn initialize_reader(&mut self, ctx: gc::Machine) -> Result<()> {
+    fn initialize_reader(&mut self, ctx: GcMachine) -> GcResult<()> {
         let file = File::open(self.path(ctx).as_str())?;
         let reader = csv::ReaderBuilder::new()
             // TODO map builder options to CsvFormat

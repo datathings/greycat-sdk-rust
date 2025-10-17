@@ -5,7 +5,10 @@ members = [
   "greycat",
   "greycat-sdk",
   "greycat-cli",
-  "hello",
+  # example of native libraries in Rust
+  "examples/csv2",
+  "examples/http2",
+  "examples/simple",
 ]
 resolver = "2"
 
