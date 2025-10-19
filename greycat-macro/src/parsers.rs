@@ -1,5 +1,16 @@
 #![allow(unused)]
 
+use syn::ImplItemFn;
+
+pub fn is_finalizer(item_fn: &ImplItemFn) -> bool {
+    for attr in &item_fn.attrs {
+        if attr.path().is_ident("finalize") {
+            return true;
+        }
+    }
+    false
+}
+
 pub struct GreycatTypeAttr {
     pub module: String,
 }

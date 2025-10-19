@@ -1,7 +1,7 @@
-use crate::ffi::FromPtr as _;
 use crate::machine::GcMachine;
 use crate::types::GcString;
 use crate::value::AsGcValue;
+use crate::FromPtr as _;
 use greycat_sys::*;
 
 #[repr(transparent)]
@@ -35,11 +35,10 @@ impl GcArray {
         let prog = ctx.get_program();
         let value = match prog.resolve_symbol_opt(elem) {
             Some(symb) => symb.as_string(ctx),
-            None => {
-                let ptr =
-                    unsafe { gc_core_string__create_from(elem.as_ptr() as _, elem.len() as u64) };
+            None => unsafe {
+                let ptr = gc_core_string__create_from(elem.as_ptr() as _, elem.len() as u64);
                 GcString::from_ptr(ptr)
-            }
+            },
         };
         self.add(value, ctx)
     }

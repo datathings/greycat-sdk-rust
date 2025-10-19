@@ -3,7 +3,7 @@ use std::ffi;
 use greycat_sys::*;
 
 use crate::{program::GcProgram, value::AsGcValue};
-use crate::{types::*, AsGcObject, FromObjectPtr};
+use crate::{types::*, AsGcObject, FromPtr};
 
 #[derive(Clone, Copy)]
 #[repr(transparent)]
@@ -42,8 +42,8 @@ impl GcMachine {
         }
     }
 
-    pub fn set_error(&self, message: impl AsRef<str>) {
-        let c_string = ffi::CString::new(message.as_ref()).expect("invalid string for C");
+    pub fn set_error<E: std::error::Error>(&self, err: E) {
+        let c_string = ffi::CString::new(err.to_string()).expect("invalid string for C");
         unsafe { gc_machine__set_runtime_error(self.0, c_string.as_ptr()) };
     }
 
@@ -150,9 +150,9 @@ impl MachineGetParam<(u32, u32)> for GcMachine {
     }
 }
 
-impl<'a, T: FromObjectPtr> MachineGetParam<&'a mut T> for GcMachine {
-    unsafe fn get_param(&self, offset: u32) -> &'a mut T {
+impl<T: FromPtr<gc_object_t>> MachineGetParam<T> for GcMachine {
+    unsafe fn get_param(&self, offset: u32) -> T {
         let slot = unsafe { gc_machine__get_param(self.0, offset) };
-        FromObjectPtr::from_object_ptr(slot.__1.object)
+        FromPtr::from_ptr(slot.__1.object)
     }
 }

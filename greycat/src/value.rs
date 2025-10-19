@@ -188,6 +188,18 @@ impl<T: AsGcObject> AsGcValue for T {
     }
 }
 
+impl AsGcValue for String {
+    fn as_value(&self) -> (gc_slot, gc_type) {
+        let str = self.as_str();
+        let ptr = str.as_ptr() as *const _;
+        let len = str.len() as u64;
+        (
+            gc_slot::object(unsafe { gc_core_string__create_from(ptr, len) as _ }),
+            gc_type_object,
+        )
+    }
+}
+
 // TODO review this..
 unsafe fn extract_char(slot: &gc_slot__bindgen_ty_1) -> char {
     let bytes = &slot.byte;

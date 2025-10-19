@@ -1,16 +1,20 @@
 use greycat::prelude::*;
 
-pub fn sum(a: i32, b: i32) -> i32 {
+#[greycat_fn]
+fn sum(a: i32, b: i32) -> i32 {
     a + b
 }
 
-pub fn sub(a: i32, b: i32) -> i32 {
+#[greycat_fn]
+fn sub(a: i32, b: i32) -> i32 {
     a - b
 }
 
-#[greycat_object]
+
+#[greycat_type]
 pub struct DoubleInputCalc;
 
+#[greycat_impl]
 impl DoubleInputCalc {
     pub fn sum(&self, ctx: GcMachine) -> i64 {
         self.a(ctx) + self.b(ctx)
@@ -18,9 +22,5 @@ impl DoubleInputCalc {
 
     pub fn sub(&self, ctx: GcMachine) -> i64 {
         self.a(ctx) - self.b(ctx)
-    }
-
-    pub fn finalize(&mut self, _: GcMachine) {
-        // noop
     }
 }

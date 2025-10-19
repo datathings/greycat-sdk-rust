@@ -2,7 +2,7 @@ use std::fs::File;
 
 use greycat::prelude::*;
 
-#[greycat_object]
+#[greycat_type]
 pub struct CsvReader {
     records: Option<Box<csv::StringRecordsIntoIter<File>>>,
 }

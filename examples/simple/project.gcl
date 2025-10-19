@@ -5,4 +5,5 @@ fn main() {
     println("sub(44, 2) = ${sub(44, 2)}");
     println("DoubleInputCalc::sum(40, 2) = ${DoubleInputCalc { a: 40, b: 2 }.sum()}");
     println("DoubleInputCalc::sub(44, 2) = ${DoubleInputCalc { a: 44, b: 2 }.sub()}");
+    println("read_file(\"project.gcl\") = ${read_file("project.gcl")}");
 }

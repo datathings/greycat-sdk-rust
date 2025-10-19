@@ -3,25 +3,11 @@ use std::{ptr::NonNull, slice};
 use greycat_sys::*;
 
 use crate::{
-    ffi::FromPtr,
-    object::{AsGcObject, FromObjectPtr, GcObjectRef},
+    object::{AsGcObject, GcObjectRef},
+    FromPtr,
 };
 
 pub struct GcString(NonNull<gc_core_string_t>);
-
-impl std::fmt::Display for GcString {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.as_str().fmt(f)
-    }
-}
-
-impl FromPtr for GcString {
-    type CType = gc_core_string_t;
-
-    fn from_ptr(ptr: *mut Self::CType) -> Self {
-        Self(unsafe { NonNull::new_unchecked(ptr) })
-    }
-}
 
 impl GcString {
     #[inline(always)]
@@ -51,14 +37,26 @@ impl AsGcObject for GcString {
     }
 }
 
-impl FromObjectPtr for GcString {
-    fn from_object_ptr<'a>(ptr: *mut gc_object_t) -> &'a mut Self {
-        unsafe { &mut *(ptr as *mut Self) }
+impl FromPtr<gc_object_t> for GcString {
+    unsafe fn from_ptr<'a>(ptr: *mut gc_object_t) -> Self {
+        Self(unsafe { NonNull::new_unchecked(ptr as _) })
+    }
+}
+
+impl FromPtr<gc_core_string_t> for GcString {
+    unsafe fn from_ptr(ptr: *mut gc_core_string_t) -> Self {
+        Self(unsafe { NonNull::new_unchecked(ptr) })
     }
 }
 
 impl AsRef<str> for GcString {
     fn as_ref(&self) -> &str {
         self.as_str()
+    }
+}
+
+impl std::fmt::Display for GcString {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.as_str().fmt(f)
     }
 }

@@ -1,25 +1,24 @@
-use core::f64;
-
 mod calc;
-mod gc_binding;
+mod gc_bindings;
+mod io2;
 
 #[derive(Debug)]
 #[allow(unused)]
-struct State {
-    a: i32,
-    b: f64,
-}
+pub(crate) struct LibState;
 
-impl gc_binding::LibraryLifecycle<State> for gc_binding::SimpleLibrary {
-    fn start(_: greycat::GcProgramMut) -> Result<Option<State>, ()> {
+impl greycat::GcLibrary for LibState {
+    fn start(_prog: greycat::GcProgramMut) -> Result<Option<Self>, ()>
+    where
+        Self: Sized,
+    {
         println!("start");
-        Ok(Some(State {
-            a: 42,
-            b: f64::consts::PI,
-        }))
+        Ok(None)
     }
 
-    fn stop(_: greycat::GcProgramMut, userdata: Option<State>) -> Result<(), ()> {
+    fn stop(_prog: greycat::GcProgramMut, userdata: Option<Self>) -> Result<(), ()>
+    where
+        Self: Sized,
+    {
         println!("stop {userdata:?}");
         Ok(())
     }

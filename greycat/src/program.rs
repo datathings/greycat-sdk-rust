@@ -1,9 +1,10 @@
 use greycat_sys::*;
 
 use crate::{
-    ffi::FromPtr as _,
     machine::GcMachine,
-    object::{AsGcObject, GcObjectRef}, types::GcString,
+    object::{AsGcObject, GcObjectRef},
+    types::GcString,
+    FromPtr as _,
 };
 
 #[derive(Clone, Copy)]
@@ -99,7 +100,12 @@ impl GcProgramMut {
     }
 
     #[inline(always)]
-    pub fn configure_type(&self, type_id: GcTypeId, bytes_size: usize, function: Option<GcObjectFinalizeFn>) {
+    pub fn configure_type(
+        &self,
+        type_id: GcTypeId,
+        bytes_size: usize,
+        function: Option<GcObjectFinalizeFn>,
+    ) {
         unsafe { gc_program_type__configure(self.0, type_id.0, bytes_size as _, function) }
     }
 }
@@ -115,8 +121,10 @@ pub struct GcSymbolId(u32);
 impl GcSymbolId {
     #[inline(always)]
     pub fn as_string(&self, ctx: GcMachine) -> GcString {
-        let ptr = unsafe { gc_program__get_symbol(ctx.get_program().0, self.0) };
-        GcString::from_ptr(ptr)
+        unsafe {
+            let ptr = gc_program__get_symbol(ctx.get_program().0, self.0);
+            GcString::from_ptr(ptr)
+        }
     }
 }
 

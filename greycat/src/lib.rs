@@ -1,3 +1,4 @@
+mod library;
 mod machine;
 mod object;
 pub mod prelude;
@@ -11,6 +12,7 @@ pub use object::*;
 pub use prelude::*;
 pub use value::*;
 pub use program::*;
+pub use library::*;
 
 pub mod sys {
     pub use greycat_sys::*;

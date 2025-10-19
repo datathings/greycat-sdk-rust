@@ -8,18 +8,16 @@ pub struct GcObject(pub(crate) gc_object_t);
 #[repr(transparent)]
 pub struct GcObjectRef(pub(crate) *mut gc_object);
 
-impl FromObjectPtr for GcObjectRef {
-    fn from_object_ptr<'a>(ptr: *mut gc_object_t) -> &'a mut Self {
-        unsafe { &mut *(ptr as *mut Self) }
-    }
-}
-
 pub trait AsGcObject {
     fn as_object(&self) -> GcObjectRef;
 }
 
-pub trait FromObjectPtr {
-    fn from_object_ptr<'a>(ptr: *mut gc_object_t) -> &'a mut Self;
+pub trait FromPtr<T> {
+    /// # Safety
+    /// You must ensure that the target impl of this trait is effectively related to the underlying `*mut gc_object_t`
+    ///
+    /// eg. calling `GcString::from_ptr(my_ptr)` will always succeed, though YOU must ensure that the pointer is a `gc_core_string_t`
+    unsafe fn from_ptr(ptr: *mut T) -> Self;
 }
 
 pub trait ObjectGetAt<T> {
@@ -70,15 +68,14 @@ impl ObjectGetAt<(gc_slot_t, gc_type_t)> for GcObjectRef {
         (slot, type_res)
     }
 }
-impl<'a, T: FromObjectPtr> ObjectGetAt<&'a mut T> for GcObjectRef {
-    unsafe fn get_at(&self, offset: u32, ctx: GcMachine) -> &'a mut T {
+impl<T: FromPtr<gc_object_t>> ObjectGetAt<T> for GcObjectRef {
+    unsafe fn get_at(&self, offset: u32, ctx: GcMachine) -> T {
         let mut type_res = gc_type_null;
         let slot = unsafe { gc_object__get_at(self.0 as *const _, offset, &mut type_res, ctx.0) };
         debug_assert!(type_res == gc_type_object);
-        T::from_object_ptr(slot.__1.object)
+        T::from_ptr(slot.__1.object)
     }
 }
-
 
 macro_rules! impl_object_get_at {
     ($ty:ty, $gc_ty:ident, $field:ident) => {
@@ -120,11 +117,11 @@ impl ObjectGetAt<(gc_slot_t, gc_type_t)> for GcObject {
         (slot, type_res)
     }
 }
-impl<'a, T: FromObjectPtr> ObjectGetAt<&'a mut T> for GcObject {
-    unsafe fn get_at(&self, offset: u32, ctx: GcMachine) -> &'a mut T {
+impl<T: FromPtr<gc_object_t>> ObjectGetAt<T> for GcObject {
+    unsafe fn get_at(&self, offset: u32, ctx: GcMachine) -> T {
         let mut type_res = gc_type_null;
         let slot = unsafe { gc_object__get_at(&self.0 as *const _, offset, &mut type_res, ctx.0) };
         debug_assert!(type_res == gc_type_object);
-        T::from_object_ptr(slot.__1.object)
+        T::from_ptr(slot.__1.object)
     }
 }

@@ -2,17 +2,9 @@ use std::ptr::NonNull;
 
 use greycat_sys::*;
 
-use crate::ffi::FromPtr;
+use crate::object::FromPtr;
 
 pub struct GcBuffer(NonNull<gc_buffer_t>);
-
-impl FromPtr for GcBuffer {
-    type CType = gc_buffer_t;
-
-    fn from_ptr(ptr: *mut Self::CType) -> Self {
-        Self(unsafe { NonNull::new_unchecked(ptr) })
-    }
-}
 
 impl GcBuffer {
     #[inline(always)]
@@ -25,5 +17,11 @@ impl GcBuffer {
     pub fn push_str(&mut self, str: &str) -> &mut Self {
         unsafe { gc_buffer__add_str(self.0.as_ptr(), str.as_ptr() as *const _, str.len() as u32) }
         self
+    }
+}
+
+impl FromPtr<gc_buffer_t> for GcBuffer {
+    unsafe fn from_ptr(ptr: *mut gc_buffer_t) -> Self {
+        Self(unsafe { NonNull::new_unchecked(ptr) })
     }
 }
