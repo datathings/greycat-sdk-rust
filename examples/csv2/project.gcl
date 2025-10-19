@@ -2,24 +2,69 @@
 
 @volatile
 private type Record {
-  mandt: int;
-  id: int;
-  time: time;
-  values: Array<int>;
+    /// column=0
+    @format("%Y-%m-%dT%H:%M:%S%z")
+    time: time;
+    /// column=1, min=-61.8842, max=83.8394, avg=22.4896408333
+    latitude: float;
+    /// column=2, min=-179.369, max=179.8605, avg=83.5534406667
+    longitude: float;
+    /// column=3, min=7.466, max=639.511, avg=55.0781866667
+    depth: float;
+    /// column=4, min=4.5, max=7.8, avg=4.8468333333
+    mag: float?;
+    /// column=5
+    magType: String?;
+    /// column=6, min=9, max=287, avg=63.9296482412
+    nst: int?;
+    /// column=7, min=20, max=263, avg=108.076599665
+    gap: int?;
+    /// column=8, min=0.1, max=31.484, avg=2.6537839196
+    dmin: float?;
+    /// column=9, min=0.32, max=1.55, avg=0.8291103333
+    rms: float?;
+    /// column=10
+    net: String;
+    /// column=11
+    id: String;
+    /// column=12
+    @format("%Y-%m-%dT%H:%M:%S%z")
+    updated: time;
+    /// column=13
+    place: String;
+    /// column=14
+    type: String;
+    /// column=15, min=2.88, max=17.47, avg=8.7943456376
+    horizontalError: float?;
+    /// column=16, min=0.972, max=22.5, avg=4.4283683333
+    depthError: float?;
+    /// column=17, min=0.02, max=0.205, avg=0.0727785235
+    magError: float?;
+    /// column=18, min=7, max=818, avg=101.1375838926
+    magNst: int?;
+    /// column=19
+    status: String;
+    /// column=20
+    locationSource: String;
+    /// column=21
+    magSource: String;
 }
 
 fn main() {
-  var reader = csv2::CsvReader<Record> {
-    path: "/path/to/file.csv",
-    // format: CsvFormat { header_lines: 1 },
-  };
+    var url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.csv";
+    var now = time::now().toDate(TimeZone::UTC);
+    try {
+        var filepath = "files/earthquakes/${now.day}-${now.month}-${now.year}.csv";
+        Http {}.getFile(url, filepath, null);
+        var reader = csv2::CsvReader<Record> {
+            path: filepath,
+        };
 
-  var start = time::now();
-  var n = 0;
-  while (reader.can_read()) {
-    var record = reader.read();
-    n = n + 1;
-    // println(record);
-  }
-  println("${n} records in ${time::now() - start}");
+        while (reader.can_read()) {
+            var record = reader.read();
+            println(record);
+        }
+    } catch (err) {
+        error("Unable to import earthquakes data: ${err}");
+    }
 }

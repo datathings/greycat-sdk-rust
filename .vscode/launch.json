@@ -10,7 +10,7 @@
       "request": "launch",
       "program": "/home/leiko/.greycat/bin/greycat",
       "args": ["run"],
-      "cwd": "${workspaceFolder}/examples/simple"
+      "cwd": "${workspaceFolder}/examples/csv2"
     },
     {
       "type": "lldb",

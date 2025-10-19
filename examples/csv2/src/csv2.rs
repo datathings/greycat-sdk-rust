@@ -2,17 +2,30 @@ use std::fs::File;
 
 use greycat::prelude::*;
 
+type Result<T> = std::result::Result<T, std::io::Error>;
+
 #[greycat_type]
 pub struct CsvReader {
     records: Option<Box<csv::StringRecordsIntoIter<File>>>,
 }
 
 impl CsvReader {
-    pub fn finalize(&mut self, _: GcMachine) {
-        self.records.take();
+    fn initialize_reader(&mut self, ctx: GcMachine) -> Result<()> {
+        let file = File::open(self.path(ctx).as_str())?;
+        let reader = csv::ReaderBuilder::new()
+            // TODO map builder options to CsvFormat
+            .has_headers(true)
+            .flexible(true)
+            .buffer_capacity(8192)
+            .from_reader(file);
+        self.records.replace(Box::new(reader.into_records()));
+        Ok(())
     }
+}
 
-    pub fn can_read(&mut self, ctx: GcMachine) -> GcResult<bool> {
+#[greycat_impl]
+impl CsvReader {
+    pub fn can_read(&mut self, ctx: GcMachine) -> Result<bool> {
         let records = match self.records.as_ref() {
             Some(records) => records,
             None => {
@@ -23,7 +36,7 @@ impl CsvReader {
         Ok(!records.reader().is_done())
     }
 
-    pub fn read(&mut self, ctx: GcMachine) -> GcResult<Option<impl AsGcValue>> {
+    pub fn read(&mut self, ctx: GcMachine) -> Result<Option<GcArray>> {
         let records = match self.records.as_mut() {
             Some(records) => records,
             None => {
@@ -49,20 +62,12 @@ impl CsvReader {
                 }
                 Ok(Some(row))
             }
-            None => Ok(Option::<GcArray>::None),
+            None => Ok(None),
         }
     }
 
-    fn initialize_reader(&mut self, ctx: GcMachine) -> GcResult<()> {
-        let file = File::open(self.path(ctx).as_str())?;
-        let reader = csv::ReaderBuilder::new()
-            // TODO map builder options to CsvFormat
-            .has_headers(true)
-            .flexible(true)
-            .buffer_capacity(8192)
-            .from_reader(file);
-        let records = reader.into_records();
-        self.records.replace(Box::new(records));
-        Ok(())
+    #[finalize]
+    fn finalize(&mut self, _: GcMachine) {
+        self.records.take();
     }
 }
