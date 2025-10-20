@@ -4,3 +4,5 @@
 /**/gcdata
 /examples/*/lib/*/*.gclib
 /examples/*/lib/installed
+/examples/*/lib/std
+/examples/*/bin

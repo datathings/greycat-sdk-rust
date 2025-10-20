@@ -3,8 +3,10 @@ members = [
   "greycat-sys",
   "greycat-macro",
   "greycat",
+  "cargo-greycat",
   # "greycat-sdk",
   # "greycat-cli",
+
   # example of native libraries in Rust
   "examples/csv2",
   # "examples/http2",
