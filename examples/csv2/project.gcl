@@ -1,4 +1,4 @@
-@library("std", "7.4.6-dev");
+@library("std", "7.4.10-dev");
 @library("csv2");
 
 @volatile
