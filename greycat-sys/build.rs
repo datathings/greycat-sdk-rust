@@ -1,11 +1,6 @@
 use std::process::Command;
 
 fn main() {
-    if cfg!(target_os = "macos") {
-        println!("cargo:rustc-link-arg=-Wl,-undefined");
-        println!("cargo:rustc-link-arg=-Wl,dynamic_lookup");
-    }
-
     Command::new("greycat")
         .arg("install")
         .output()

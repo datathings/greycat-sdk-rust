@@ -7,8 +7,10 @@ authors.workspace = true
 license.workspace = true
 
 [lib]
-crate-type = ["cdylib"]
 test = false
+crate-type = ["cdylib"]
+[target.'cfg(windows)'.lib]
+crate-type = ["staticlib"]
 
 [dependencies]
 greycat = { workspace = true }
