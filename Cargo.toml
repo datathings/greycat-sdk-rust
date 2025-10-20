@@ -3,14 +3,27 @@ members = [
   "greycat-sys",
   "greycat-macro",
   "greycat",
-  "greycat-sdk",
-  "greycat-cli",
+  # "greycat-sdk",
+  # "greycat-cli",
   # example of native libraries in Rust
   "examples/csv2",
-  "examples/http2",
+  # "examples/http2",
   "examples/simple",
 ]
 resolver = "2"
+
+[workspace.package]
+version = "7.4.0-dev"
+edition = "2021"
+authors = ["Maxime Tricoire <maxime.tricoire@datathings.com>"]
+license = "Apache-2.0"
+
+[workspace.dependencies]
+greycat-macro = { path = "./greycat-macro" }
+greycat-sys = { path = "./greycat-sys" }
+greycat = { path = "./greycat" }
+# greycat-sdk = { path = "./greycat-sdk" }
+# greycat-cli = { path = "./greycat-cli" }
 
 [profile.release]
 strip = true

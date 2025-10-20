@@ -1,39 +1,32 @@
-image: oci.datathings.com/greycat/crossbuild:4.1.17-rust
-
 variables:
   GIT_STRATEGY: clone
   GIT_DEPTH: "0"
 
 stages:
   - build
-  - publish
 
 before_script:
-  - export VERSION=`git2version -s`
+  - export VERSION_MAJOR_MINOR=`cat VERSION`
+  - export VERSION=`greycat build-version`
+  - echo "${VERSION_MAJOR_MINOR} / ${VERSION}"
 
-# This folder is cached between builds
-# https://docs.gitlab.com/ee/ci/yaml/index.html#cache
-cache:
-  paths:
-    - node_modules/
-
-build:
+x64-linux:
   stage: build
+  tags: [ linux ]
   script:
-    - ./build.sh
-  artifacts:
-    when: on_success
-    expire_in: '30 days'
-    paths:
-      - dist
+    - cargo build --release --target=x86_64-unknown-linux-gnu
+    - cargo test
 
-publish:
-  stage: publish
-  when: manual
+arm64-apple:
+  stage: build
+  tags: [ macos_native ]
   script:
-    - ./publish.sh
-  artifacts:
-    expire_in: 1 week
-    paths:
-      - dist
+    - cargo build --release --target=aarch64-apple-darwin
+    - cargo test
 
+x64-windows:
+  stage: build
+  tags: [ mingw ]
+  script:
+    - cargo build --release --target=x86_64-pc-windows-gnu
+    - cargo test

@@ -1,15 +1,15 @@
 [package]
 name = "greycat-cli"
-version = "0.1.0"
-edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
 
 [dependencies]
 anyhow = "1.0.75"
 base64 = "0.21.7"
 clap = { version = "4.4.17", features = ["derive"]}
-greycat-sdk = { path = "../greycat-sdk" }
+greycat-sdk = { workspace = true }
 hex = "0.4.3"
 reqwest = { version = "0.11.22", default-features = false, features = ["blocking", "json", "rustls-tls"] }
 serde = "1.0.189"

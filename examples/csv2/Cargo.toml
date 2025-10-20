@@ -1,11 +1,15 @@
 [package]
 name = "csv2"
-version = "0.1.0"
-edition = "2021"
+publish = false
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
 
 [lib]
 crate-type = ["cdylib"]
+test = false
 
 [dependencies]
-greycat = { path = "../../greycat" }
+greycat = { workspace = true }
 csv = "*"
