@@ -101,8 +101,8 @@ fn greycat_build(args: &[String]) {
 }
 
 fn greycat_pre_build(crate_dir: &Path, greycat_target: &str) {
-    // run_greycat(crate_dir, &["install"]);
-    // run_greycat(crate_dir, &["codegen", "rust"]);
+    run_greycat(crate_dir, &["install"]);
+    run_greycat(crate_dir, &["codegen", "rust"]);
 
     // greycat install with target and --force
     let status = Command::new("greycat")
