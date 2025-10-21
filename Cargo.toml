@@ -8,9 +8,9 @@ members = [
   # "greycat-cli",
 
   # example of native libraries in Rust
-  "examples/csv2",
+  # "examples/csv2",
   # "examples/http2",
-  "examples/simple",
+  # "examples/simple",
 ]
 resolver = "2"
 

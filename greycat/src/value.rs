@@ -25,11 +25,11 @@ pub enum GcValue {
     Time(GcTime),
     Duration(GcDuration),
     T2((u32, u32)),
-    // gc_type_t3: T3((u21, u21, u21)),
+    // T3(T3),
     T4((u16, u16, u16, u16)),
     // gc_type_t2f: T2f((f32, f32)),
     // gc_type_t3f: T3f((u21, u21, u21)),
-    // gc_type_t4f: T4f((u16, u16, u16, u16)),
+    // gc_type_t4f: T4f((f16, f16, f16, f16)),
     // gc_type_cubic
     // gc_type_str
     // gc_type_block_ref
