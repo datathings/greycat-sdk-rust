@@ -67,7 +67,12 @@ pub struct BuildFinished {
 }
 
 fn main() {
-    let args: Vec<String> = env::args().skip(1).collect();
+    let mut args: Vec<String> = env::args().skip(1).collect();
+
+    // if invoked as `cargo greycat` strip `greycat` from the args
+    if args.first().map(|arg| arg == "greycat").unwrap_or(false) {
+        args.remove(0);
+    }
 
     match args.first().map(|v| v.as_str()) {
         Some("build") => greycat_build(&args[1..]),
