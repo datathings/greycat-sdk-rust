@@ -1,8 +1,6 @@
-use std::fs::File;
-
-use greycat::prelude::*;
-
 use crate::gc;
+use greycat::prelude::*;
+use std::fs::File;
 
 #[greycat_type]
 pub struct CsvReader {
@@ -19,7 +17,7 @@ impl CsvReader {
     fn initialize_reader(&mut self, ctx: GcMachine) -> GcResult<()> {
         let path: GcString = unsafe { self.get_at(gc::csv2_CsvReader_path, ctx) };
         let options: Option<GcObject> = unsafe { self.get_at(gc::csv2_CsvReader_options, ctx) };
-        
+
         let file = File::open(path.as_str())?;
         let mut builder = match options {
             Some(opts) => opts.reader_builder(ctx),

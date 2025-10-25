@@ -1,6 +1,6 @@
 use std::ptr::NonNull;
 use greycat_sys::*;
-use crate::object::{FromPtr, AsPtr, AsPtrMut};
+use crate::object::{WrapPtr, AsPtr, AsPtrMut};
 
 #[repr(transparent)]
 pub struct GcBuffer(NonNull<gc_buffer_t>);
@@ -31,14 +31,14 @@ impl AsPtrMut for GcBuffer {
     }
 }
 
-impl FromPtr<gc_object_t> for GcBuffer {
-    unsafe fn from_ptr(ptr: *mut gc_object_t) -> Self {
+impl WrapPtr<gc_object_t> for GcBuffer {
+    unsafe fn wrap_ptr(ptr: *mut gc_object_t) -> Self {
         Self(unsafe { NonNull::new_unchecked(ptr as _) })
     }
 }
 
-impl FromPtr<gc_buffer_t> for GcBuffer {
-    unsafe fn from_ptr(ptr: *mut gc_buffer_t) -> Self {
+impl WrapPtr<gc_buffer_t> for GcBuffer {
+    unsafe fn wrap_ptr(ptr: *mut gc_buffer_t) -> Self {
         Self(unsafe { NonNull::new_unchecked(ptr) })
     }
 }

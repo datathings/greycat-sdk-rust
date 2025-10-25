@@ -1,6 +1,6 @@
 use greycat_sys::*;
 
-use crate::{machine::GcMachine, types::GcString, FromPtr as _, Object};
+use crate::{machine::GcMachine, types::GcString, Object, WrapPtr as _};
 
 #[derive(Clone, Copy)]
 #[repr(C)]
@@ -120,13 +120,9 @@ impl GcProgramMut {
     }
 
     #[inline(always)]
-    pub fn configure_type<T: Object>(
-        &self,
-        type_id: GcTypeId,
-        finalizer: Option<GcObjectFinalizeFn>,
-    ) {
+    pub fn configure_type<T: Object>(&self, type_id: GcTypeId, finalizer: GcObjectFinalizeFn) {
         let bytes_size = ::std::mem::size_of::<T>();
-        unsafe { gc_program_type__configure(self.0, type_id.0, bytes_size as _, finalizer) }
+        unsafe { gc_program_type__configure(self.0, type_id.0, bytes_size as _, Some(finalizer)) }
     }
 }
 
@@ -143,7 +139,7 @@ impl GcSymbolId {
     pub fn as_string(&self, ctx: GcMachine) -> GcString {
         unsafe {
             let ptr = gc_program__get_symbol(ctx.get_program().0, self.0);
-            GcString::from_ptr(ptr)
+            GcString::wrap_ptr(ptr)
         }
     }
 }

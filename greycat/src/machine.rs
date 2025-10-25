@@ -3,7 +3,7 @@ use std::ffi;
 use greycat_sys::*;
 
 use crate::{program::GcProgram, value::AsGcValue};
-use crate::{types::*, FromPtr, GcTypeId};
+use crate::{types::*, WrapPtr, GcTypeId};
 
 #[derive(Clone, Copy)]
 #[repr(transparent)]
@@ -142,9 +142,9 @@ impl MachineGetParam<(u32, u32)> for GcMachine {
     }
 }
 
-impl<T: FromPtr<gc_object_t>> MachineGetParam<T> for GcMachine {
+impl<T: WrapPtr<gc_object_t>> MachineGetParam<T> for GcMachine {
     unsafe fn get_param(&self, offset: u32) -> T {
         let slot = unsafe { gc_machine__get_param(self.0, offset) };
-        FromPtr::from_ptr(slot.__1.object)
+        WrapPtr::wrap_ptr(slot.__1.object)
     }
 }

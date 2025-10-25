@@ -25,8 +25,7 @@ pub fn greycat_type(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let struct_ident = &item_struct.ident;
     let generics = &item_struct.generics;
     let fields = item_struct.fields.iter();
-    let finalizer_const = format_ident!("_gc_{struct_ident}_finalize");
-    let finalizer_fn = format_ident!("__gc_{struct_ident}_finalize_fn");
+    let finalizer_fn = format_ident!("{struct_ident}_finalize");
 
     if let syn::Fields::Unnamed(_) = item_struct.fields {
         return TokenStream::from(
@@ -45,29 +44,33 @@ pub fn greycat_type(_attr: TokenStream, item: TokenStream) -> TokenStream {
           #(#fields),*
         }
 
-        impl ::greycat::object::AsPtr for CsvReader {
+        impl ::greycat::object::FromPtr for #struct_ident {
+            fn from_ptr<'a>(ptr: *mut ::greycat::sys::gc_object_t) -> &'a mut Self {
+                unsafe { &mut *(ptr as *mut Self) }
+            }
+        }
+
+        impl ::greycat::object::AsPtr for #struct_ident {
             fn as_ptr(&self) -> *const ::greycat::sys::gc_object_t {
                 self as *const Self as *const _
             }
         }
 
-        impl ::greycat::object::AsPtrMut for CsvReader {
+        impl ::greycat::object::AsPtrMut for #struct_ident {
             fn as_ptr_mut(&mut self) -> *mut ::greycat::sys::gc_object_t {
                 self as *mut Self as *mut _
             }
         }
 
         #[allow(non_snake_case)]
-        unsafe extern "C" fn #finalizer_fn(
+        pub(crate) unsafe extern "C" fn #finalizer_fn(
             this: *mut ::greycat::sys::gc_object_t,
             ctx: *mut ::greycat::sys::gc_machine_t,
         ) {
             let ctx = ::greycat::GcMachine(ctx);
-            let this = unsafe { &mut *(this as *mut #struct_ident) };
+            let this = #struct_ident::from_ptr(this);
             #struct_ident::finalize(this, ctx);
         }
-        #[allow(non_upper_case_globals)]
-        pub(crate) static #finalizer_const: Option<::greycat::GcObjectFinalizeFn> = Some(#finalizer_fn);
     };
 
     TokenStream::from(expanded)

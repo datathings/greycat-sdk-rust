@@ -3,21 +3,6 @@ use greycat_sys::*;
 use crate::{machine::GcMachine, types, AsGcValue, GcType, GcTypeId, GcValue};
 
 #[repr(transparent)]
-pub struct GcObjectOwned(pub(crate) gc_object_t);
-
-impl AsPtr for GcObjectOwned {
-    fn as_ptr(&self) -> *const gc_object_t {
-        &self.0 as _
-    }
-}
-
-impl AsPtrMut for GcObjectOwned {
-    fn as_ptr_mut(&mut self) -> *mut gc_object_t {
-        &mut self.0 as _
-    }
-}
-
-#[repr(transparent)]
 pub struct GcObject(pub(crate) *mut gc_object);
 
 impl GcObject {
@@ -45,8 +30,12 @@ impl AsGcValue for GcObject {
     }
 }
 
-impl FromPtr<gc_object_t> for GcObject {
-    unsafe fn from_ptr(ptr: *mut gc_object_t) -> Self {
+pub trait FromPtr {
+    fn from_ptr<'a>(ptr: *mut gc_object_t) -> &'a mut Self;
+}
+
+impl WrapPtr<gc_object_t> for GcObject {
+    unsafe fn wrap_ptr(ptr: *mut gc_object_t) -> Self {
         Self(ptr)
     }
 }
@@ -63,12 +52,27 @@ pub trait AsPtrMut {
     }
 }
 
-pub trait FromPtr<T> {
+pub trait WrapPtr<T> {
     /// # Safety
     /// You must ensure that the target impl of this trait is effectively related to the underlying `*mut gc_object_t`
     ///
     /// eg. calling `GcString::from_ptr(my_ptr)` will always succeed, though YOU must ensure that the pointer is a `gc_core_string_t`
-    unsafe fn from_ptr(ptr: *mut T) -> Self;
+    unsafe fn wrap_ptr(ptr: *mut T) -> Self;
+}
+
+#[repr(transparent)]
+pub struct GcObjectOwned(pub(crate) gc_object_t);
+
+impl AsPtr for GcObjectOwned {
+    fn as_ptr(&self) -> *const gc_object_t {
+        &self.0 as _
+    }
+}
+
+impl AsPtrMut for GcObjectOwned {
+    fn as_ptr_mut(&mut self) -> *mut gc_object_t {
+        &mut self.0 as _
+    }
 }
 
 pub trait Object {
@@ -265,16 +269,16 @@ impl<O: AsPtr> ObjectGetAt<Option<types::GcTime>> for O {
     }
 }
 
-impl<O: AsPtr, T: FromPtr<gc_object_t>> ObjectGetAt<T> for O {
+impl<O: AsPtr, T: WrapPtr<gc_object_t>> ObjectGetAt<T> for O {
     unsafe fn get_at(&self, offset: u32, ctx: GcMachine) -> T {
         let mut type_res = gc_type_null;
         let slot = unsafe { gc_object__get_at(self.as_ptr(), offset, &mut type_res, ctx.0) };
         debug_assert!(type_res == gc_type_object);
-        T::from_ptr(slot.__1.object)
+        T::wrap_ptr(slot.__1.object)
     }
 }
 
-impl<O: AsPtr, T: FromPtr<gc_object_t>> ObjectGetAt<Option<T>> for O {
+impl<O: AsPtr, T: WrapPtr<gc_object_t>> ObjectGetAt<Option<T>> for O {
     unsafe fn get_at(&self, offset: u32, ctx: GcMachine) -> Option<T> {
         let mut type_res = gc_type_null;
         let slot = unsafe { gc_object__get_at(self.as_ptr(), offset, &mut type_res, ctx.0) };
@@ -282,7 +286,7 @@ impl<O: AsPtr, T: FromPtr<gc_object_t>> ObjectGetAt<Option<T>> for O {
             None
         } else {
             debug_assert!(type_res == gc_type_object);
-            Some(T::from_ptr(slot.__1.object))
+            Some(T::wrap_ptr(slot.__1.object))
         }
     }
 }

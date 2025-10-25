@@ -1,4 +1,4 @@
-use crate::object::{AsPtr, AsPtrMut, FromPtr};
+use crate::object::{AsPtr, AsPtrMut, WrapPtr};
 use greycat_sys::*;
 use std::{ffi, ptr::NonNull, slice};
 
@@ -31,7 +31,7 @@ impl From<&str> for GcString {
         let ptr = value.as_ptr() as *const ffi::c_char;
         let len = value.len();
         let s = unsafe { gc_core_string__create_from(ptr, len as u64) };
-        unsafe { Self::from_ptr(s) }
+        unsafe { Self::wrap_ptr(s) }
     }
 }
 
@@ -47,14 +47,14 @@ impl AsPtrMut for GcString {
     }
 }
 
-impl FromPtr<gc_object_t> for GcString {
-    unsafe fn from_ptr<'a>(ptr: *mut gc_object_t) -> Self {
+impl WrapPtr<gc_object_t> for GcString {
+    unsafe fn wrap_ptr<'a>(ptr: *mut gc_object_t) -> Self {
         Self(unsafe { NonNull::new_unchecked(ptr as _) })
     }
 }
 
-impl FromPtr<gc_core_string_t> for GcString {
-    unsafe fn from_ptr(ptr: *mut gc_core_string_t) -> Self {
+impl WrapPtr<gc_core_string_t> for GcString {
+    unsafe fn wrap_ptr(ptr: *mut gc_core_string_t) -> Self {
         Self(unsafe { NonNull::new_unchecked(ptr) })
     }
 }

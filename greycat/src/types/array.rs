@@ -2,7 +2,7 @@ use std::ptr::NonNull;
 
 use crate::machine::GcMachine;
 use crate::value::AsGcValue;
-use crate::{AsPtr, AsPtrMut, FromPtr};
+use crate::{AsPtr, AsPtrMut, WrapPtr};
 use greycat_sys::*;
 
 #[repr(transparent)]
@@ -91,8 +91,8 @@ impl AsPtrMut for GcArray {
     }
 }
 
-impl FromPtr<gc_object_t> for GcArray {
-    unsafe fn from_ptr(ptr: *mut gc_object_t) -> Self {
+impl WrapPtr<gc_object_t> for GcArray {
+    unsafe fn wrap_ptr(ptr: *mut gc_object_t) -> Self {
         Self(unsafe { NonNull::new_unchecked(ptr as _) })
     }
 }
