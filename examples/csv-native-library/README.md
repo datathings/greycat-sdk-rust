@@ -13,6 +13,10 @@ Or from the root:
 ```sh
 cargo install --path cargo-greycat
 ```
+Or from Github:
+```sh
+cargo install --git https://github.com/datathings/greycat-sdk-rust.git --branch dev
+```
 
 ## Build (debug)
 ```sh
