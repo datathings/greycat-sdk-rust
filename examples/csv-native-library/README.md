@@ -19,11 +19,13 @@ cargo install --git https://github.com/datathings/greycat-sdk-rust.git --branch 
 ```
 
 ## Build (debug)
+> Make sure you are in `examples/csv-native-library` before running this command
 ```sh
 cargo greycat build
 ```
 
 ## Build (release)
+> Make sure you are in `examples/csv-native-library` before running this command
 ```sh 
 cargo greycat build --release
 ```
@@ -32,6 +34,7 @@ cargo greycat build --release
 > If the build is successful, it copies the built artifacts to `lib/csv2/csv2.gclib`
 
 ## Run
+> Make sure you are in `examples/csv-native-library` before running this command
 ```sh
 greycat run
 ```
