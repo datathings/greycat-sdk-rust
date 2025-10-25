@@ -1,1 +1,0 @@
-native fn read_file(path: String): String;

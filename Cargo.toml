@@ -6,10 +6,6 @@ members = [
   "cargo-greycat",
   # "greycat-sdk",
   # "greycat-cli",
-
-  # example of native libraries in Rust
-  # "examples/http2",
-  # "examples/simple",
 ]
 resolver = "2"
 

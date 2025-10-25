@@ -1,7 +1,0 @@
-@library("std", "7.4.10-dev");
-@library("http2");
-
-
-fn main() {
-
-}
