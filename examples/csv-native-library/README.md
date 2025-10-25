@@ -4,6 +4,16 @@ An example of native library to parse csv
 
 > This is a work in progress
 
+## Install
+Make sure you have `cargo-greycat` installed. In this repository you can run:
+```sh
+cargo install --path ../../cargo-greycat
+```
+Or from the root:
+```sh
+cargo install --path cargo-greycat
+```
+
 ## Build (debug)
 ```sh
 cargo greycat build
