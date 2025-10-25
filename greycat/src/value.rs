@@ -1,11 +1,6 @@
-use std::ptr::NonNull;
-
+use crate::types::*;
 use greycat_sys::*;
-
-use crate::{
-    object::AsGcObject,
-    types::{GcDuration, GcTime},
-};
+use std::ptr::NonNull;
 
 pub enum GcValue {
     Error,
@@ -24,7 +19,7 @@ pub enum GcValue {
     Geo(u64),
     Time(GcTime),
     Duration(GcDuration),
-    T2((u32, u32)),
+    T2(GcT2),
     // T3(T3),
     T4((u16, u16, u16, u16)),
     // gc_type_t2f: T2f((f32, f32)),
@@ -42,23 +37,21 @@ pub enum GcValue {
 }
 
 impl AsGcValue for GcValue {
-    fn as_value(&self) -> (gc_slot, gc_type) {
+    fn to_value(self) -> (gc_slot, gc_type) {
         match self {
             Self::Undefined => (gc_slot_t::null(), gc_type_undefined),
             Self::Null => (gc_slot_t::null(), gc_type_null),
-            Self::Bool(v) => (gc_slot_t::b(*v), gc_type_bool),
-            Self::Char(v) => (gc_slot_t::char(*v), gc_type_char),
-            Self::Int(v) => (gc_slot_t::i64(*v), gc_type_bool),
-            Self::Float(v) => (gc_slot_t::f64(*v), gc_type_float),
-            Self::Duration(v) => v.as_value(),
-            Self::Time(v) => v.as_value(),
-            Self::StaticField(left, right) => {
-                (gc_slot_t::tu32(*left, *right), gc_type_static_field)
-            }
-            Self::Type(v) => (gc_slot_t::u32(*v), gc_type_type),
-            Self::Field(v) => (gc_slot_t::u32(*v), gc_type_field),
-            Self::Function(v) => (gc_slot_t::u32(*v), gc_type_function),
-            Self::StringLit(v) => (gc_slot_t::u32(*v), gc_type_stringlit),
+            Self::Bool(v) => (gc_slot_t::b(v), gc_type_bool),
+            Self::Char(v) => (gc_slot_t::char(v), gc_type_char),
+            Self::Int(v) => (gc_slot_t::i64(v), gc_type_bool),
+            Self::Float(v) => (gc_slot_t::f64(v), gc_type_float),
+            Self::Duration(v) => v.to_value(),
+            Self::Time(v) => v.to_value(),
+            Self::StaticField(left, right) => (gc_slot_t::tu32(left, right), gc_type_static_field),
+            Self::Type(v) => (gc_slot_t::u32(v), gc_type_type),
+            Self::Field(v) => (gc_slot_t::u32(v), gc_type_field),
+            Self::Function(v) => (gc_slot_t::u32(v), gc_type_function),
+            Self::StringLit(v) => (gc_slot_t::u32(v), gc_type_stringlit),
             Self::Object(ptr) => (gc_slot_t::object(ptr.as_ptr()), gc_type_object),
             _ => unimplemented!("todo"),
         }
@@ -77,7 +70,7 @@ impl From<(gc_slot_t, gc_type_t)> for GcValue {
             (slot, gc_type_float) => Self::Float(unsafe { slot.__1.f64_ }),
             (slot, gc_type_time) => Self::Time(GcTime(unsafe { slot.__1.i64_ })),
             (slot, gc_type_duration) => Self::Duration(GcDuration(unsafe { slot.__1.i64_ })),
-            (slot, gc_type_char) => Self::Char(unsafe { extract_char(&slot.__1) }),
+            (slot, gc_type_char) => Self::Char(unsafe { slot.as_char() }),
             (slot, gc_type_field) => Self::Field(unsafe { slot.__1.u32_ }),
             (slot, gc_type_function) => Self::Function(unsafe { slot.__1.u32_ }),
             (slot, gc_type_type) => Self::Type(unsafe { slot.__1.u32_ }),
@@ -90,24 +83,23 @@ impl From<(gc_slot_t, gc_type_t)> for GcValue {
             (slot, gc_type_object) => {
                 Self::Object(unsafe { NonNull::new_unchecked(slot.__1.object) })
             }
-            // TODO the rest...
-            (_, _) => Self::Error,
+            (_, _) => unimplemented!("todo"),
         }
     }
 }
 
 pub trait AsGcValue {
-    fn as_value(&self) -> (gc_slot, gc_type);
+    fn to_value(self) -> (gc_slot, gc_type);
 }
 
 macro_rules! impl_as_value_for_int {
     ($($type:ty),*) => {
         $(
             impl AsGcValue for $type {
-                fn as_value(&self) -> (gc_slot, gc_type) {
+                fn to_value(self) -> (gc_slot, gc_type) {
                     (
                         gc_slot {
-                            __1: gc_slot__bindgen_ty_1 { i64_: *self as i64 },
+                            __1: gc_slot__bindgen_ty_1 { i64_: self as i64 },
                         },
                         gc_type_int,
                     )
@@ -121,10 +113,10 @@ macro_rules! impl_as_value_for_uint {
     ($($type:ty),*) => {
         $(
             impl AsGcValue for $type {
-                fn as_value(&self) -> (gc_slot, gc_type) {
+                fn to_value(self) -> (gc_slot, gc_type) {
                     (
                         gc_slot {
-                            __1: gc_slot__bindgen_ty_1 { u64_: *self as u64 },
+                            __1: gc_slot__bindgen_ty_1 { u64_: self as u64 },
                         },
                         gc_type_int,
                     )
@@ -138,10 +130,10 @@ macro_rules! impl_as_value_for_float {
     ($($type:ty),*) => {
         $(
             impl AsGcValue for $type {
-                fn as_value(&self) -> (gc_slot, gc_type) {
+                fn to_value(self) -> (gc_slot, gc_type) {
                     (
                         gc_slot {
-                            __1: gc_slot__bindgen_ty_1 { f64_: *self as f64 },
+                            __1: gc_slot__bindgen_ty_1 { f64_: self as f64 },
                         },
                         gc_type_float,
                     )
@@ -156,10 +148,10 @@ impl_as_value_for_uint!(u16, u32, u64, usize);
 impl_as_value_for_float!(f32, f64);
 
 impl AsGcValue for bool {
-    fn as_value(&self) -> (gc_slot, gc_type) {
+    fn to_value(self) -> (gc_slot, gc_type) {
         (
             gc_slot {
-                __1: gc_slot__bindgen_ty_1 { b: *self },
+                __1: gc_slot__bindgen_ty_1 { b: self },
             },
             gc_type_bool,
         )
@@ -167,29 +159,43 @@ impl AsGcValue for bool {
 }
 
 impl AsGcValue for () {
-    fn as_value(&self) -> (gc_slot, gc_type) {
+    fn to_value(self) -> (gc_slot, gc_type) {
         (gc_slot::null(), gc_type_null)
     }
 }
 
+impl AsGcValue for *mut gc_object_t {
+    fn to_value(self) -> (gc_slot, gc_type) {
+        (gc_slot::object(self), gc_type_object)
+    }
+}
+
 impl<T: AsGcValue> AsGcValue for Option<T> {
-    fn as_value(&self) -> (gc_slot, gc_type) {
+    fn to_value(self) -> (gc_slot, gc_type) {
         match self {
-            Some(value) => value.as_value(),
+            Some(value) => value.to_value(),
             None => (gc_slot::null(), gc_type_null),
         }
     }
 }
 
-impl<T: AsGcObject> AsGcValue for T {
-    fn as_value(&self) -> (gc_slot, gc_type) {
-        let object = self.as_object();
-        (gc_slot::object(object.0), gc_type_object)
+impl AsGcValue for &str {
+    fn to_value(self) -> (gc_slot, gc_type) {
+        let ptr = self.as_ptr() as *const std::ffi::c_char;
+        let len = self.len() as u64;
+        let s = unsafe { gc_core_string__create_from(ptr, len) };
+        (gc_slot::object(s as _), gc_type_object)
     }
 }
 
+// impl<T: AsPtrMut> AsGcValue for T {
+//     fn to_value(mut self) -> (gc_slot, gc_type) {
+//         (gc_slot_t::object(self.as_ptr_mut()), gc_type_object)
+//     }
+// }
+
 impl AsGcValue for String {
-    fn as_value(&self) -> (gc_slot, gc_type) {
+    fn to_value(self) -> (gc_slot, gc_type) {
         let str = self.as_str();
         let ptr = str.as_ptr() as *const _;
         let len = str.len() as u64;
@@ -198,29 +204,4 @@ impl AsGcValue for String {
             gc_type_object,
         )
     }
-}
-
-// TODO review this..
-unsafe fn extract_char(slot: &gc_slot__bindgen_ty_1) -> char {
-    let bytes = &slot.byte;
-
-    // Determine how many bytes the first UTF-8 char uses
-    let first_byte = bytes[0];
-
-    let char_len = if first_byte & 0b1000_0000 == 0 {
-        1
-    } else if first_byte & 0b1110_0000 == 0b1100_0000 {
-        2
-    } else if first_byte & 0b1111_0000 == 0b1110_0000 {
-        3
-    } else if first_byte & 0b1111_1000 == 0b1111_0000 {
-        4
-    } else {
-        return '\0';
-    };
-
-    // Decode UTF-8
-    let slice = &bytes[0..char_len];
-    let s = std::str::from_utf8_unchecked(slice);
-    s.chars().next().unwrap()
 }

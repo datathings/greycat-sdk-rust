@@ -12,6 +12,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "anyhow"
+version = "1.0.100"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a23eb6b1614318a8071c9b2521f36b424b2c83db5eb3a0fead4a6c0809af6e61"
+
+[[package]]
 name = "bindgen"
 version = "0.71.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -41,6 +47,7 @@ checksum = "8f68f53c83ab957f72c32642f3868eec03eb974d1fb82e453128456482613d36"
 name = "cargo-greycat"
 version = "7.4.0-dev"
 dependencies = [
+ "anyhow",
  "serde",
  "serde_json",
 ]
@@ -87,6 +94,7 @@ checksum = "a8d1add55171497b4705a648c6b583acafb01d58050a51727785f0b2c8e0a2b2"
 name = "greycat"
 version = "7.4.0-dev"
 dependencies = [
+ "anyhow",
  "greycat-macro",
  "greycat-sys",
 ]

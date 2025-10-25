@@ -3,7 +3,7 @@ use std::ffi;
 use greycat_sys::*;
 
 use crate::{program::GcProgram, value::AsGcValue};
-use crate::{types::*, AsGcObject, FromPtr};
+use crate::{types::*, FromPtr, GcTypeId};
 
 #[derive(Clone, Copy)]
 #[repr(transparent)]
@@ -33,7 +33,7 @@ impl GcMachine {
 
     /// If the value is a `gc_type_object` it will be unmarked
     pub fn set_result(&self, value: impl AsGcValue) {
-        let (slot_value, slot_type) = value.as_value();
+        let (slot_value, slot_type) = value.to_value();
         unsafe {
             gc_machine__set_result(self.0, slot_value, slot_type);
             if slot_type == gc_type_object {
@@ -42,24 +42,16 @@ impl GcMachine {
         }
     }
 
-    pub fn set_error<E: std::error::Error>(&self, err: E) {
+    pub fn set_error(&self, err: anyhow::Error) {
         let c_string = ffi::CString::new(err.to_string()).expect("invalid string for C");
         unsafe { gc_machine__set_runtime_error(self.0, c_string.as_ptr()) };
     }
 
-    /// Sets the result and unmarks the given object
+    /// # Safety
+    /// It is your responsibility to ensure that the generic type matches with the underlying pointer
     #[inline(always)]
-    pub fn set_result_object(&self, obj: impl AsGcObject) {
-        let obj = obj.as_object();
-        unsafe {
-            gc_machine__set_result(self.0, gc_slot::object(obj.0), gc_type_object);
-            gc_object__un_mark(obj.0, self.0);
-        }
-    }
-
-    #[inline(always)]
-    pub fn create_object(&self, type_id: u32) -> *mut gc_object_t {
-        unsafe { gc_machine__create_object(self.0, type_id) }
+    pub unsafe fn create_object<T>(&self, type_id: GcTypeId) -> *mut T {
+        gc_machine__create_object(self.0, type_id.0) as *mut T
     }
 
     /// # Safety

@@ -1,14 +1,13 @@
 mod array;
-pub use array::*;
-
 mod buffer;
-pub use buffer::*;
-
 mod duration;
-pub use duration::*;
-
 mod string;
-pub use string::*;
-
 mod time;
+mod tuple;
+
+pub use array::*;
+pub use buffer::*;
+pub use duration::*;
+pub use string::*;
 pub use time::*;
+pub use tuple::*;

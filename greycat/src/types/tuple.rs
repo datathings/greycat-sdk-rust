@@ -2,11 +2,11 @@ use crate::AsGcValue;
 
 #[derive(Clone, Copy)]
 #[repr(transparent)]
-pub struct GcTime(pub i64);
+pub struct GcT2(pub (u32, u32));
 
-impl AsGcValue for GcTime {
+impl AsGcValue for GcT2 {
     #[inline(always)]
     fn to_value(self) -> (greycat_sys::gc_slot, greycat_sys::gc_type) {
-        (greycat_sys::gc_slot::i64(self.0), greycat_sys::gc_type_time)
+        todo!()
     }
 }

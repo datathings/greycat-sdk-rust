@@ -77,6 +77,32 @@ impl gc_slot_t {
             __1: gc_slot__bindgen_ty_1 { u64_: u64 },
         }
     }
+
+    /// # Safety
+    /// You must ensure that the current value stored in the slot is a char
+    pub unsafe fn as_char(&self) -> char {
+        let bytes = &unsafe { self.__1.byte };
+
+        // Determine how many bytes the first UTF-8 char uses
+        let first_byte = bytes[0];
+
+        let char_len = if first_byte & 0b1000_0000 == 0 {
+            1
+        } else if first_byte & 0b1110_0000 == 0b1100_0000 {
+            2
+        } else if first_byte & 0b1111_0000 == 0b1110_0000 {
+            3
+        } else if first_byte & 0b1111_1000 == 0b1111_0000 {
+            4
+        } else {
+            return '\0';
+        };
+
+        // Decode UTF-8
+        let slice = &bytes[0..char_len];
+        let s = unsafe { std::str::from_utf8_unchecked(slice) };
+        s.chars().next().unwrap()
+    }
 }
 
 impl std::default::Default for gc_slot_t {

@@ -8,3 +8,4 @@ license.workspace = true
 [dependencies]
 greycat-sys = { workspace = true }
 greycat-macro = { workspace = true }
+anyhow = { workspace = true }

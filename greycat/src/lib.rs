@@ -1,11 +1,11 @@
 mod library;
 mod machine;
-mod object;
+pub mod object;
 pub mod prelude;
 mod program;
 mod value;
-mod ffi;
 pub mod types;
+pub mod error;
 
 pub use machine::*;
 pub use object::*;
@@ -18,5 +18,10 @@ pub mod sys {
     pub use greycat_sys::*;
 }
 
+pub use greycat_macro::gc_type_id;
+
 mod alloc;
 pub use alloc::*;
+
+// re-export 'anyhow'
+pub use anyhow;

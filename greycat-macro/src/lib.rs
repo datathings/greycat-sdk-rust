@@ -2,6 +2,22 @@ use proc_macro::TokenStream;
 use quote::{format_ident, quote};
 use syn::{parse_macro_input, spanned::Spanned};
 
+#[proc_macro]
+pub fn gc_type_id(input: TokenStream) -> TokenStream {
+    let ident = syn::parse_macro_input!(input as syn::Ident);
+    let static_ident = format_ident!("_{ident}");
+
+    let expanded = quote! {
+      static mut #static_ident: ::greycat::GcTypeId = ::greycat::GcTypeId(0);
+      #[inline(always)]
+      pub(crate) fn #ident() -> ::greycat::GcTypeId {
+        unsafe { #static_ident }
+      }
+    };
+
+    TokenStream::from(expanded)
+}
+
 #[proc_macro_attribute]
 pub fn greycat_type(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let item_struct = parse_macro_input!(item as syn::ItemStruct);
@@ -9,6 +25,8 @@ pub fn greycat_type(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let struct_ident = &item_struct.ident;
     let generics = &item_struct.generics;
     let fields = item_struct.fields.iter();
+    let finalizer_const = format_ident!("_gc_{struct_ident}_finalize");
+    let finalizer_fn = format_ident!("__gc_{struct_ident}_finalize_fn");
 
     if let syn::Fields::Unnamed(_) = item_struct.fields {
         return TokenStream::from(
@@ -20,13 +38,36 @@ pub fn greycat_type(_attr: TokenStream, item: TokenStream) -> TokenStream {
         );
     }
 
-    // Generate the rewritten struct
     let expanded = quote! {
-      #[repr(C)]
-      #vis struct #struct_ident #generics {
-        pub(crate) __header: ::greycat::GcObject,
-        #(#fields)*
-      }
+        #[repr(C)]
+        #vis struct #struct_ident #generics {
+          pub(crate) __header: ::greycat::GcObjectOwned,
+          #(#fields),*
+        }
+
+        impl ::greycat::object::AsPtr for CsvReader {
+            fn as_ptr(&self) -> *const ::greycat::sys::gc_object_t {
+                self as *const Self as *const _
+            }
+        }
+
+        impl ::greycat::object::AsPtrMut for CsvReader {
+            fn as_ptr_mut(&mut self) -> *mut ::greycat::sys::gc_object_t {
+                self as *mut Self as *mut _
+            }
+        }
+
+        #[allow(non_snake_case)]
+        unsafe extern "C" fn #finalizer_fn(
+            this: *mut ::greycat::sys::gc_object_t,
+            ctx: *mut ::greycat::sys::gc_machine_t,
+        ) {
+            let ctx = ::greycat::GcMachine(ctx);
+            let this = unsafe { &mut *(this as *mut #struct_ident) };
+            #struct_ident::finalize(this, ctx);
+        }
+        #[allow(non_upper_case_globals)]
+        pub(crate) static #finalizer_const: Option<::greycat::GcObjectFinalizeFn> = Some(#finalizer_fn);
     };
 
     TokenStream::from(expanded)
@@ -49,37 +90,9 @@ pub fn greycat_impl(_attr: TokenStream, item: TokenStream) -> TokenStream {
     };
 
     let mut bindings = Vec::new();
-    let mut has_finalizer = false;
 
     for item in &item_impl.items {
         match item {
-            syn::ImplItem::Fn(m) if is_finalizer(m) => {
-                if has_finalizer {
-                    return TokenStream::from(
-                        syn::Error::new(m.span(), "only one method can be a #[finalize]")
-                            .to_compile_error(),
-                    );
-                }
-
-                let fn_ident = &m.sig.ident;
-                let binding_name = format_ident!("_gc_{type_name}_finalize");
-                let finalizer = format_ident!("__gc_{type_name}_finalize_fn");
-
-                bindings.push(quote! {
-                  #[allow(non_snake_case)]
-                  unsafe extern "C" fn #finalizer(
-                    this: *mut ::greycat::sys::gc_object_t,
-                    ctx: *mut ::greycat::sys::gc_machine_t,
-                  ) {
-                    let ctx = ::greycat::GcMachine(ctx);
-                    let this = unsafe { &mut *(this as *mut #type_name) };
-                    #type_name::#fn_ident(this, ctx);
-                  }
-                  #[allow(non_upper_case_globals)]
-                  pub(crate) static #binding_name: Option<::greycat::GcObjectFinalizeFn> = Some(#finalizer);
-                });
-                has_finalizer = true;
-            }
             syn::ImplItem::Fn(m) => {
                 let fn_ident = &m.sig.ident;
                 let binding_name = format_ident!("_gc_{type_name}__{fn_ident}");
@@ -120,14 +133,6 @@ pub fn greycat_impl(_attr: TokenStream, item: TokenStream) -> TokenStream {
         }
     }
 
-    if !has_finalizer {
-        let binding_name = format_ident!("_gc_{type_name}_finalize");
-        bindings.push(quote! {
-          #[allow(non_upper_case_globals)]
-          pub(crate) static #binding_name: Option<::greycat::GcObjectFinalizeFn> = None;
-        });
-    }
-
     let expanded = quote! {
       #item_impl
 
@@ -135,11 +140,6 @@ pub fn greycat_impl(_attr: TokenStream, item: TokenStream) -> TokenStream {
     };
 
     TokenStream::from(expanded)
-}
-
-#[proc_macro_attribute]
-pub fn finalize(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    item
 }
 
 #[proc_macro_attribute]
@@ -210,11 +210,12 @@ pub fn greycat_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
     TokenStream::from(expanded)
 }
 
-fn is_finalizer(item_fn: &syn::ImplItemFn) -> bool {
-    for attr in &item_fn.attrs {
-        if attr.path().is_ident("finalize") {
-            return true;
-        }
-    }
-    false
+#[proc_macro_derive(Object)]
+pub fn derive_type(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as syn::DeriveInput);
+    let name = input.ident;
+    let expanded = quote! {
+      impl ::greycat::Object for #name {}
+    };
+    TokenStream::from(expanded)
 }

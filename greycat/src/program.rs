@@ -1,11 +1,6 @@
 use greycat_sys::*;
 
-use crate::{
-    machine::GcMachine,
-    object::{AsGcObject, GcObjectRef},
-    types::GcString,
-    FromPtr as _,
-};
+use crate::{machine::GcMachine, types::GcString, FromPtr as _, Object};
 
 #[derive(Clone, Copy)]
 #[repr(C)]
@@ -38,6 +33,28 @@ impl GcProgram {
             Some(GcSymbolId(id))
         }
     }
+
+    pub fn resolve_module(&self, module: &str) -> Option<GcModuleId> {
+        let module = self.resolve_symbol_opt(module)?;
+        let id = unsafe { gc_program__resolve_module(self.0, module.0) };
+        if id == 0 {
+            None
+        } else {
+            Some(GcModuleId(id))
+        }
+    }
+
+    #[inline(always)]
+    pub fn resolve_type(&self, module: &str, type_name: &str) -> Option<GcTypeId> {
+        let module = self.resolve_module(module)?;
+        let type_name = self.resolve_symbol_opt(type_name)?;
+        let id = unsafe { gc_program__resolve_type(self.0, module.0, type_name.0) };
+        if id == 0 {
+            None
+        } else {
+            Some(GcTypeId(id))
+        }
+    }
 }
 
 #[derive(Clone, Copy)]
@@ -63,22 +80,25 @@ impl GcProgramMut {
     }
 
     #[inline(always)]
-    pub fn resolve_type(&self, module: GcModuleId, type_name: &str) -> GcTypeId {
+    pub fn resolve_type(&self, module: GcModuleId, type_name: &str) -> Option<GcTypeId> {
         let type_name_off = self.resolve_symbol(type_name);
         let id = unsafe { gc_program__resolve_type(self.0, module.0, type_name_off.0) };
-        assert!(
-            id != 0,
-            "unable to resolve type '{type_name}' in module {module:?}"
-        );
-        GcTypeId(id)
+        if id == 0 {
+            None
+        } else {
+            Some(GcTypeId(id))
+        }
     }
 
     #[inline(always)]
-    pub fn resolve_module(&self, name: &str) -> GcModuleId {
+    pub fn resolve_module(&self, name: &str) -> Option<GcModuleId> {
         let mod_name_offset = self.resolve_symbol(name);
         let id = unsafe { gc_program__resolve_module(self.0, mod_name_offset.0) };
-        assert!(id != 0, "unable to resolve module '{name}'");
-        GcModuleId(id)
+        if id == 0 {
+            None
+        } else {
+            Some(GcModuleId(id))
+        }
     }
 
     #[inline(always)]
@@ -100,13 +120,13 @@ impl GcProgramMut {
     }
 
     #[inline(always)]
-    pub fn configure_type(
+    pub fn configure_type<T: Object>(
         &self,
         type_id: GcTypeId,
-        bytes_size: usize,
-        function: Option<GcObjectFinalizeFn>,
+        finalizer: Option<GcObjectFinalizeFn>,
     ) {
-        unsafe { gc_program_type__configure(self.0, type_id.0, bytes_size as _, function) }
+        let bytes_size = ::std::mem::size_of::<T>();
+        unsafe { gc_program_type__configure(self.0, type_id.0, bytes_size as _, finalizer) }
     }
 }
 
@@ -130,7 +150,7 @@ impl GcSymbolId {
 
 #[derive(Clone, Copy, Debug)]
 #[repr(transparent)]
-pub struct GcTypeId(u32);
+pub struct GcTypeId(pub u32);
 
 #[repr(transparent)]
 pub struct GcSymbol(pub *mut gc_program_symbol_t);
@@ -142,12 +162,14 @@ impl GcSymbol {
     }
 }
 
-impl AsGcObject for GcSymbol {
-    #[inline(always)]
-    fn as_object(&self) -> GcObjectRef {
-        GcObjectRef(self.0 as _)
-    }
-}
-
 pub type GcMachineFn = unsafe extern "C" fn(ctx: *mut gc_machine_t);
 pub type GcObjectFinalizeFn = unsafe extern "C" fn(this: *mut gc_object_t, ctx: *mut gc_machine_t);
+
+#[repr(transparent)]
+pub struct GcType(pub(crate) *mut gc_program_type_t);
+
+impl GcType {
+    pub fn name(&self) -> &'static str {
+        todo!()
+    }
+}

@@ -1,12 +1,8 @@
-use std::{ptr::NonNull, slice};
-
+use crate::object::{AsPtr, AsPtrMut, FromPtr};
 use greycat_sys::*;
+use std::{ffi, ptr::NonNull, slice};
 
-use crate::{
-    object::{AsGcObject, GcObjectRef},
-    FromPtr,
-};
-
+#[repr(transparent)]
 pub struct GcString(NonNull<gc_core_string_t>);
 
 impl GcString {
@@ -30,10 +26,24 @@ impl GcString {
     }
 }
 
-impl AsGcObject for GcString {
-    #[inline(always)]
-    fn as_object(&self) -> GcObjectRef {
-        GcObjectRef(self.0.as_ptr() as _)
+impl From<&str> for GcString {
+    fn from(value: &str) -> Self {
+        let ptr = value.as_ptr() as *const ffi::c_char;
+        let len = value.len();
+        let s = unsafe { gc_core_string__create_from(ptr, len as u64) };
+        unsafe { Self::from_ptr(s) }
+    }
+}
+
+impl AsPtr for GcString {
+    fn as_ptr(&self) -> *const gc_object_t {
+        self.0.as_ptr() as _
+    }
+}
+
+impl AsPtrMut for GcString {
+    fn as_ptr_mut(&mut self) -> *mut gc_object_t {
+        self.0.as_ptr() as _
     }
 }
 

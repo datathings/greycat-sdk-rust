@@ -8,7 +8,6 @@ members = [
   # "greycat-cli",
 
   # example of native libraries in Rust
-  # "examples/csv2",
   # "examples/http2",
   # "examples/simple",
 ]
@@ -26,6 +25,7 @@ greycat-sys = { path = "./greycat-sys" }
 greycat = { path = "./greycat" }
 # greycat-sdk = { path = "./greycat-sdk" }
 # greycat-cli = { path = "./greycat-cli" }
+anyhow = { version = "1.0.100" }
 
 [profile.release]
 strip = true
