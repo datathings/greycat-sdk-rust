@@ -1,0 +1,30 @@
+@library("std", "7.4.99-dev");
+@library("csv2");
+
+@volatile
+type Record {
+    id: String;
+    name: String;
+    age: int;
+}
+
+fn main() {
+    var reader = csv2::CsvReader<Record> {
+        path: "data/sample.csv",
+        options: CsvOptions {
+            delimiter: ',',
+            flexible: false,
+            has_header: true,
+            trim: CsvTrim::Fields,
+        },
+    };
+
+    var record: Record?;
+    while (true) {
+        record = reader.read();
+        if (record == null) {
+            break;
+        }
+        println(record);
+    }
+}

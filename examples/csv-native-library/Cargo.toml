@@ -1,0 +1,12 @@
+[package]
+name = "csv2"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+csv = "1.4.0"
+greycat = { path = "../../greycat" } # we use local path in this repository but in a real library you would give:
+# greycat = { git = "https://github.com/datathings/greycat-sdk-rust.git", branch = "dev" }

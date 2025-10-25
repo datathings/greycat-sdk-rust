@@ -1,0 +1,10 @@
+# Rust
+/target
+
+# GreyCat
+/gcdata
+/bin
+/files
+/lib/std
+/lib/installed
+/lib/csv2/csv2.gclib

@@ -1,0 +1,44 @@
+type CsvReader<T> {
+  private path: String;
+  private options: CsvOptions?;
+
+  native fn can_read(): bool;
+  native fn read(): T?;
+}
+
+type CsvOptions {
+  /// Whether to treat the first row as a special header row.
+  ///
+  /// By default, the first row is treated as a special header row, which means the header is never returned by
+  /// the reading method. When this is disabled, the first row is not treated specially.
+  has_header: bool?;
+  /// The field delimiter to use. Default is `','`
+  delimiter: char?;
+  /// Whether the number of fields in records is allowed to change or not.
+  ///
+  /// When disabled (which is the default), parsing CSV data will return an error if a record is found
+  /// with a number of fields different from the number of fields in a previous record.
+  ///
+  /// When enabled, this error checking is turned off.
+  flexible: bool?;
+  /// Whether fields are trimmed of leading or trailing whitespace or not.
+  ///
+  /// By default, no trimming is performed. This method permits one to override that behavior and choose one of
+  /// the options defined by the `CsvTrim` enum.
+  ///
+  /// A value is only interpreted as a header value if this CSV reader is configured to read a header record (which is the default).
+  ///
+  /// When reading string records, characters meeting the definition of Unicode whitespace are trimmed.
+  /// When reading byte records, characters meeting the definition of ASCII whitespace are trimmed.
+  /// ASCII whitespace characters correspond to the set `[\t\n\v\f\r ]`.
+  trim: CsvTrim?;
+}
+
+enum CsvTrim {
+  /// Trims only header values
+  Headers,
+  /// Trims only non-header or "field" values
+  Fields,
+  /// Trims both header and non-header values
+  All,
+}
