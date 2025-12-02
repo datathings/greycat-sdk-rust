@@ -2,6 +2,7 @@
 /files
 /**/files
 /**/gcdata
+/project.gcl
 /examples/*/lib/*/*.gclib
 /examples/*/lib/installed
 /examples/*/lib/std

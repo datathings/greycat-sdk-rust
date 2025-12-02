@@ -4,8 +4,11 @@ members = [
   "greycat-macro",
   "greycat",
   "cargo-greycat",
-  # "greycat-sdk",
+  "greycat-sdk",
+  "greycat-abi",
+  "greycat-gcb",
   # "greycat-cli",
+
 ]
 exclude = ["examples"]
 resolver = "2"
@@ -17,14 +20,19 @@ authors = ["Maxime Tricoire <maxime.tricoire@datathings.com>"]
 license = "Apache-2.0"
 
 [workspace.dependencies]
-greycat-macro = { path = "./greycat-macro" }
-greycat-sys = { path = "./greycat-sys" }
-greycat = { path = "./greycat" }
+greycat-gcb = { path = "greycat-gcb" }
+greycat-abi = { path = "greycat-abi" }
+greycat-macro = { path = "greycat-macro" }
+greycat-sys = { path = "greycat-sys" }
+greycat = { path = "greycat" }
 # greycat-sdk = { path = "./greycat-sdk" }
 # greycat-cli = { path = "./greycat-cli" }
-anyhow = { version = "1.0.100" }
+anyhow = "1.0.100"
+thiserror = "2.0.17"
+serde = "1.0.228"
+serde_json = "1.0.145"
 
 [profile.release]
 strip = true
-lto = true
-panic = "abort"
+opt-level = 3
+lto = "thin"

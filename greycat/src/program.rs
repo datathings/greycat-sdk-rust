@@ -132,7 +132,7 @@ pub struct GcModuleId(u32);
 
 #[derive(Clone, Copy, Debug)]
 #[repr(transparent)]
-pub struct GcSymbolId(u32);
+pub struct GcSymbolId(pub u32);
 
 impl GcSymbolId {
     #[inline(always)]

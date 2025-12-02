@@ -1,0 +1,11 @@
+[package]
+name = "greycat-gcb"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+greycat = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
