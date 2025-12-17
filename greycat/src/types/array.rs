@@ -26,8 +26,8 @@ impl GcArray {
         self.set_slot(offset, value, value_type, ctx.0)
     }
 
-    pub fn get(&mut self, offset: u32) -> Option<(gc_slot, gc_type)> {
-        let mut slot = gc_slot::null();
+    pub fn get(&mut self, offset: u32) -> Option<(gc_slot_t, gc_type_t)> {
+        let mut slot = gc_slot_t::null();
         let mut slot_type = gc_type_null;
         unsafe {
             if gc_core_array__get_slot(self.0.as_ptr(), offset, &mut slot, &mut slot_type) {

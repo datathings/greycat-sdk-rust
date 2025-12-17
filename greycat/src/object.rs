@@ -3,7 +3,7 @@ use greycat_sys::*;
 use crate::{machine::GcMachine, types, AsGcValue, GcType, GcTypeId, GcValue};
 
 #[repr(transparent)]
-pub struct GcObject(pub(crate) *mut gc_object);
+pub struct GcObject(pub(crate) *mut gc_object_t);
 
 impl GcObject {
     #[inline(always)]
@@ -25,8 +25,8 @@ impl GcObject {
 pub struct GcEnum(pub (u32, u32));
 
 impl AsGcValue for GcObject {
-    fn to_value(self) -> (gc_slot, gc_type) {
-        (gc_slot::object(self.0), gc_type_object)
+    fn to_value(self) -> (gc_slot_t, gc_type_t) {
+        (gc_slot_t::object(self.0), gc_type_object)
     }
 }
 

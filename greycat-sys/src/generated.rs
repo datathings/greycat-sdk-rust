@@ -20,53 +20,134 @@ pub type u64_t = u64;
 pub type f64_t = double_t;
 pub type c128_t = __BindgenComplex<f64>;
 pub type c64_t = __BindgenComplex<f32>;
-pub const gc_type_null: gc_type = 0;
-pub const gc_type_bool: gc_type = 1;
-pub const gc_type_char: gc_type = 2;
-pub const gc_type_int: gc_type = 3;
-pub const gc_type_float: gc_type = 4;
-pub const gc_type_node: gc_type = 5;
-pub const gc_type_node_time: gc_type = 6;
-pub const gc_type_node_index: gc_type = 7;
-pub const gc_type_node_list: gc_type = 8;
-pub const gc_type_node_geo: gc_type = 9;
-pub const gc_type_geo: gc_type = 10;
-pub const gc_type_time: gc_type = 11;
-pub const gc_type_duration: gc_type = 12;
-pub const gc_type_cubic: gc_type = 13;
-pub const gc_type_static_field: gc_type = 14;
-pub const gc_type_object: gc_type = 15;
-pub const gc_type_t2: gc_type = 16;
-pub const gc_type_t3: gc_type = 17;
-pub const gc_type_t4: gc_type = 18;
-pub const gc_type_str: gc_type = 19;
-pub const gc_type_t2f: gc_type = 20;
-pub const gc_type_t3f: gc_type = 21;
-pub const gc_type_t4f: gc_type = 22;
-pub const gc_type_block_ref: gc_type = 23;
-pub const gc_type_block_inline: gc_type = 24;
-pub const gc_type_function: gc_type = 25;
-pub const gc_type_undefined: gc_type = 26;
-pub const gc_type_type: gc_type = 27;
-pub const gc_type_field: gc_type = 28;
-pub const gc_type_stringlit: gc_type = 29;
-pub const gc_type_error: gc_type = 30;
+pub const gc_type_null: gc_type_t = 0;
+pub const gc_type_bool: gc_type_t = 1;
+pub const gc_type_char: gc_type_t = 2;
+pub const gc_type_int: gc_type_t = 3;
+pub const gc_type_float: gc_type_t = 4;
+pub const gc_type_node: gc_type_t = 5;
+pub const gc_type_node_time: gc_type_t = 6;
+pub const gc_type_node_index: gc_type_t = 7;
+pub const gc_type_node_list: gc_type_t = 8;
+pub const gc_type_node_geo: gc_type_t = 9;
+pub const gc_type_geo: gc_type_t = 10;
+pub const gc_type_time: gc_type_t = 11;
+pub const gc_type_duration: gc_type_t = 12;
+pub const gc_type_cubic: gc_type_t = 13;
+pub const gc_type_static_field: gc_type_t = 14;
+pub const gc_type_object: gc_type_t = 15;
+pub const gc_type_t2: gc_type_t = 16;
+pub const gc_type_t3: gc_type_t = 17;
+pub const gc_type_t4: gc_type_t = 18;
+pub const gc_type_str: gc_type_t = 19;
+pub const gc_type_t2f: gc_type_t = 20;
+pub const gc_type_t3f: gc_type_t = 21;
+pub const gc_type_t4f: gc_type_t = 22;
+pub const gc_type_block_ref: gc_type_t = 23;
+pub const gc_type_block_inline: gc_type_t = 24;
+pub const gc_type_function: gc_type_t = 25;
+pub const gc_type_undefined: gc_type_t = 26;
+pub const gc_type_type: gc_type_t = 27;
+pub const gc_type_field: gc_type_t = 28;
+pub const gc_type_stringlit: gc_type_t = 29;
+pub const gc_type_error: gc_type_t = 30;
 #[doc = " must fit on 8 bits !"]
-pub type gc_type = ::core::ffi::c_uint;
-#[doc = " must fit on 8 bits !"]
-pub use self::gc_type as gc_type_t;
-pub const gc_args_format_gcb: gc_args_format_t = 0;
-pub const gc_args_format_json: gc_args_format_t = 1;
-pub const gc_args_format_text: gc_args_format_t = 2;
-pub const gc_args_format_none: gc_args_format_t = 3;
-pub type gc_args_format_t = ::core::ffi::c_uint;
+pub type gc_type_t = ::core::ffi::c_uint;
+pub const gc_args_format_gcb: gc_format_t = 0;
+pub const gc_args_format_json: gc_format_t = 1;
+pub const gc_args_format_text: gc_format_t = 2;
+pub const gc_args_format_none: gc_format_t = 3;
+pub type gc_format_t = ::core::ffi::c_uint;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct gc_buffer {
     _unused: [u8; 0],
 }
 pub type gc_buffer_t = gc_buffer;
-pub type gc_object_t = gc_object;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct gc_block {
+    _unused: [u8; 0],
+}
+pub type gc_block_t = gc_block;
+#[doc = " Generic handle for GreyCat Objects must be packed to 128 (64+32+32) bits"]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct gc_object_t {
+    pub block: *mut gc_block_t,
+    pub marks: u32_t,
+    pub type_id: u32_t,
+}
+#[allow(clippy::unnecessary_operation, clippy::identity_op)]
+const _: () = {
+    ["Size of gc_object_t"][::core::mem::size_of::<gc_object_t>() - 16usize];
+    ["Alignment of gc_object_t"][::core::mem::align_of::<gc_object_t>() - 8usize];
+    ["Offset of field: gc_object_t::block"][::core::mem::offset_of!(gc_object_t, block) - 0usize];
+    ["Offset of field: gc_object_t::marks"][::core::mem::offset_of!(gc_object_t, marks) - 8usize];
+    ["Offset of field: gc_object_t::type_id"]
+        [::core::mem::offset_of!(gc_object_t, type_id) - 12usize];
+};
+#[doc = " Tuple for static vars like enum"]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct gc_slot_tuple_u32_t {
+    pub left: u32_t,
+    pub right: u32_t,
+}
+#[allow(clippy::unnecessary_operation, clippy::identity_op)]
+const _: () = {
+    ["Size of gc_slot_tuple_u32_t"][::core::mem::size_of::<gc_slot_tuple_u32_t>() - 8usize];
+    ["Alignment of gc_slot_tuple_u32_t"][::core::mem::align_of::<gc_slot_tuple_u32_t>() - 4usize];
+    ["Offset of field: gc_slot_tuple_u32_t::left"]
+        [::core::mem::offset_of!(gc_slot_tuple_u32_t, left) - 0usize];
+    ["Offset of field: gc_slot_tuple_u32_t::right"]
+        [::core::mem::offset_of!(gc_slot_tuple_u32_t, right) - 4usize];
+};
+#[doc = " Generic GreyCat variable handle"]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct gc_slot_t {
+    pub __1: gc_slot_t__bindgen_ty_1,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union gc_slot_t__bindgen_ty_1 {
+    pub b: bool,
+    pub byte: [u8_t; 8usize],
+    pub u32_: u32_t,
+    pub i64_: i64_t,
+    pub u64_: u64_t,
+    pub f64_: f64_t,
+    pub tu32: gc_slot_tuple_u32_t,
+    pub object: *mut gc_object_t,
+}
+#[allow(clippy::unnecessary_operation, clippy::identity_op)]
+const _: () = {
+    ["Size of gc_slot_t__bindgen_ty_1"][::core::mem::size_of::<gc_slot_t__bindgen_ty_1>() - 8usize];
+    ["Alignment of gc_slot_t__bindgen_ty_1"]
+        [::core::mem::align_of::<gc_slot_t__bindgen_ty_1>() - 8usize];
+    ["Offset of field: gc_slot_t__bindgen_ty_1::b"]
+        [::core::mem::offset_of!(gc_slot_t__bindgen_ty_1, b) - 0usize];
+    ["Offset of field: gc_slot_t__bindgen_ty_1::byte"]
+        [::core::mem::offset_of!(gc_slot_t__bindgen_ty_1, byte) - 0usize];
+    ["Offset of field: gc_slot_t__bindgen_ty_1::u32_"]
+        [::core::mem::offset_of!(gc_slot_t__bindgen_ty_1, u32_) - 0usize];
+    ["Offset of field: gc_slot_t__bindgen_ty_1::i64_"]
+        [::core::mem::offset_of!(gc_slot_t__bindgen_ty_1, i64_) - 0usize];
+    ["Offset of field: gc_slot_t__bindgen_ty_1::u64_"]
+        [::core::mem::offset_of!(gc_slot_t__bindgen_ty_1, u64_) - 0usize];
+    ["Offset of field: gc_slot_t__bindgen_ty_1::f64_"]
+        [::core::mem::offset_of!(gc_slot_t__bindgen_ty_1, f64_) - 0usize];
+    ["Offset of field: gc_slot_t__bindgen_ty_1::tu32"]
+        [::core::mem::offset_of!(gc_slot_t__bindgen_ty_1, tu32) - 0usize];
+    ["Offset of field: gc_slot_t__bindgen_ty_1::object"]
+        [::core::mem::offset_of!(gc_slot_t__bindgen_ty_1, object) - 0usize];
+};
+#[allow(clippy::unnecessary_operation, clippy::identity_op)]
+const _: () = {
+    ["Size of gc_slot_t"][::core::mem::size_of::<gc_slot_t>() - 8usize];
+    ["Alignment of gc_slot_t"][::core::mem::align_of::<gc_slot_t>() - 8usize];
+};
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct gc_machine {
@@ -99,12 +180,6 @@ pub struct gc_program_function {
 pub type gc_program_function_t = gc_program_function;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct gc_block {
-    _unused: [u8; 0],
-}
-pub type gc_block_t = gc_block;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct gc_program_library {
     _unused: [u8; 0],
 }
@@ -123,94 +198,95 @@ pub struct gc_program_type_field {
 pub type gc_program_type_field_t = gc_program_type_field;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct gc_slot_tuple_u32 {
-    pub left: u32_t,
-    pub right: u32_t,
+pub struct gc_program_symbol {
+    _unused: [u8; 0],
 }
-#[allow(clippy::unnecessary_operation, clippy::identity_op)]
-const _: () = {
-    ["Size of gc_slot_tuple_u32"][::core::mem::size_of::<gc_slot_tuple_u32>() - 8usize];
-    ["Alignment of gc_slot_tuple_u32"][::core::mem::align_of::<gc_slot_tuple_u32>() - 4usize];
-    ["Offset of field: gc_slot_tuple_u32::left"]
-        [::core::mem::offset_of!(gc_slot_tuple_u32, left) - 0usize];
-    ["Offset of field: gc_slot_tuple_u32::right"]
-        [::core::mem::offset_of!(gc_slot_tuple_u32, right) - 4usize];
-};
-pub type gc_slot_tuple_u32_t = gc_slot_tuple_u32;
-pub type gc_slot_t = gc_slot;
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct gc_slot {
-    pub __1: gc_slot__bindgen_ty_1,
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub union gc_slot__bindgen_ty_1 {
-    pub b: bool,
-    pub byte: [u8_t; 8usize],
-    pub u32_: u32_t,
-    pub i64_: i64_t,
-    pub u64_: u64_t,
-    pub f64_: f64_t,
-    pub tu32: gc_slot_tuple_u32_t,
-    pub object: *mut gc_object_t,
-}
-#[allow(clippy::unnecessary_operation, clippy::identity_op)]
-const _: () = {
-    ["Size of gc_slot__bindgen_ty_1"][::core::mem::size_of::<gc_slot__bindgen_ty_1>() - 8usize];
-    ["Alignment of gc_slot__bindgen_ty_1"]
-        [::core::mem::align_of::<gc_slot__bindgen_ty_1>() - 8usize];
-    ["Offset of field: gc_slot__bindgen_ty_1::b"]
-        [::core::mem::offset_of!(gc_slot__bindgen_ty_1, b) - 0usize];
-    ["Offset of field: gc_slot__bindgen_ty_1::byte"]
-        [::core::mem::offset_of!(gc_slot__bindgen_ty_1, byte) - 0usize];
-    ["Offset of field: gc_slot__bindgen_ty_1::u32_"]
-        [::core::mem::offset_of!(gc_slot__bindgen_ty_1, u32_) - 0usize];
-    ["Offset of field: gc_slot__bindgen_ty_1::i64_"]
-        [::core::mem::offset_of!(gc_slot__bindgen_ty_1, i64_) - 0usize];
-    ["Offset of field: gc_slot__bindgen_ty_1::u64_"]
-        [::core::mem::offset_of!(gc_slot__bindgen_ty_1, u64_) - 0usize];
-    ["Offset of field: gc_slot__bindgen_ty_1::f64_"]
-        [::core::mem::offset_of!(gc_slot__bindgen_ty_1, f64_) - 0usize];
-    ["Offset of field: gc_slot__bindgen_ty_1::tu32"]
-        [::core::mem::offset_of!(gc_slot__bindgen_ty_1, tu32) - 0usize];
-    ["Offset of field: gc_slot__bindgen_ty_1::object"]
-        [::core::mem::offset_of!(gc_slot__bindgen_ty_1, object) - 0usize];
-};
-#[allow(clippy::unnecessary_operation, clippy::identity_op)]
-const _: () = {
-    ["Size of gc_slot"][::core::mem::size_of::<gc_slot>() - 8usize];
-    ["Alignment of gc_slot"][::core::mem::align_of::<gc_slot>() - 8usize];
-};
-pub const gc_task_status_empty: gc_task_status = 0;
-pub const gc_task_status_waiting: gc_task_status = 1;
-pub const gc_task_status_running: gc_task_status = 2;
-pub const gc_task_status_await: gc_task_status = 3;
-pub const gc_task_status_cancelled: gc_task_status = 4;
-pub const gc_task_status_error: gc_task_status = 5;
-pub const gc_task_status_ended: gc_task_status = 6;
-pub const gc_task_status_ended_with_errors: gc_task_status = 7;
-pub type gc_task_status = ::core::ffi::c_uint;
-pub use self::gc_task_status as gc_task_status_t;
+pub type gc_program_symbol_t = gc_program_symbol;
+pub type gc_core_string_t = gc_program_symbol_t;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct gc_function_param {
+pub struct gc_core_map {
+    _unused: [u8; 0],
+}
+pub type gc_core_map_t = gc_core_map;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct gc_core_array {
+    _unused: [u8; 0],
+}
+pub type gc_core_array_t = gc_core_array;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct gc_core_table {
+    _unused: [u8; 0],
+}
+pub type gc_core_table_t = gc_core_table;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct gc_core_tensor {
+    _unused: [u8; 0],
+}
+pub type gc_core_tensor_t = gc_core_tensor;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct gc_core_tensor_descriptor_t {
+    pub dim: [i64_t; 8usize],
+    pub nb_dim: i8_t,
+    pub batch_dim: i8_t,
+    pub type_: u8_t,
+    pub nature: u8_t,
+    pub size: i64_t,
+    pub capacity: i64_t,
+}
+#[allow(clippy::unnecessary_operation, clippy::identity_op)]
+const _: () = {
+    ["Size of gc_core_tensor_descriptor_t"]
+        [::core::mem::size_of::<gc_core_tensor_descriptor_t>() - 88usize];
+    ["Alignment of gc_core_tensor_descriptor_t"]
+        [::core::mem::align_of::<gc_core_tensor_descriptor_t>() - 8usize];
+    ["Offset of field: gc_core_tensor_descriptor_t::dim"]
+        [::core::mem::offset_of!(gc_core_tensor_descriptor_t, dim) - 0usize];
+    ["Offset of field: gc_core_tensor_descriptor_t::nb_dim"]
+        [::core::mem::offset_of!(gc_core_tensor_descriptor_t, nb_dim) - 64usize];
+    ["Offset of field: gc_core_tensor_descriptor_t::batch_dim"]
+        [::core::mem::offset_of!(gc_core_tensor_descriptor_t, batch_dim) - 65usize];
+    ["Offset of field: gc_core_tensor_descriptor_t::type_"]
+        [::core::mem::offset_of!(gc_core_tensor_descriptor_t, type_) - 66usize];
+    ["Offset of field: gc_core_tensor_descriptor_t::nature"]
+        [::core::mem::offset_of!(gc_core_tensor_descriptor_t, nature) - 67usize];
+    ["Offset of field: gc_core_tensor_descriptor_t::size"]
+        [::core::mem::offset_of!(gc_core_tensor_descriptor_t, size) - 72usize];
+    ["Offset of field: gc_core_tensor_descriptor_t::capacity"]
+        [::core::mem::offset_of!(gc_core_tensor_descriptor_t, capacity) - 80usize];
+};
+pub const gc_task_status_empty: gc_task_status_t = 0;
+pub const gc_task_status_waiting: gc_task_status_t = 1;
+pub const gc_task_status_running: gc_task_status_t = 2;
+pub const gc_task_status_await: gc_task_status_t = 3;
+pub const gc_task_status_cancelled: gc_task_status_t = 4;
+pub const gc_task_status_error: gc_task_status_t = 5;
+pub const gc_task_status_ended: gc_task_status_t = 6;
+pub const gc_task_status_ended_with_errors: gc_task_status_t = 7;
+pub const gc_task_status_breakpoint: gc_task_status_t = 8;
+pub type gc_task_status_t = ::core::ffi::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct gc_function_param_t {
     pub name: u32_t,
     pub type_desc: u32_t,
     pub s_type_off: u32_t,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of gc_function_param"][::core::mem::size_of::<gc_function_param>() - 12usize];
-    ["Alignment of gc_function_param"][::core::mem::align_of::<gc_function_param>() - 4usize];
-    ["Offset of field: gc_function_param::name"]
-        [::core::mem::offset_of!(gc_function_param, name) - 0usize];
-    ["Offset of field: gc_function_param::type_desc"]
-        [::core::mem::offset_of!(gc_function_param, type_desc) - 4usize];
-    ["Offset of field: gc_function_param::s_type_off"]
-        [::core::mem::offset_of!(gc_function_param, s_type_off) - 8usize];
+    ["Size of gc_function_param_t"][::core::mem::size_of::<gc_function_param_t>() - 12usize];
+    ["Alignment of gc_function_param_t"][::core::mem::align_of::<gc_function_param_t>() - 4usize];
+    ["Offset of field: gc_function_param_t::name"]
+        [::core::mem::offset_of!(gc_function_param_t, name) - 0usize];
+    ["Offset of field: gc_function_param_t::type_desc"]
+        [::core::mem::offset_of!(gc_function_param_t, type_desc) - 4usize];
+    ["Offset of field: gc_function_param_t::s_type_off"]
+        [::core::mem::offset_of!(gc_function_param_t, s_type_off) - 8usize];
 };
-pub type gc_function_param_t = gc_function_param;
 unsafe extern "C" {
     pub fn gc_host__get_global() -> *mut gc_host_t;
 }
@@ -220,8 +296,8 @@ unsafe extern "C" {
         self_: *mut gc_host_t,
         fn_off: u32_t,
         args_payload: *const ::core::ffi::c_char,
-        args_payload_len: u32_t,
-        args_format: gc_args_format_t,
+        args_payload_len: u64_t,
+        args_format: gc_format_t,
         user_id: u32_t,
         roles_flags: u64_t,
         created_task_id: *mut i64_t,
@@ -290,13 +366,6 @@ unsafe extern "C" {
 unsafe extern "C" {
     pub fn gc_machine__get_host(ctx: *mut gc_machine_t) -> *mut gc_host_t;
 }
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct gc_program_symbol {
-    _unused: [u8; 0],
-}
-pub type gc_program_symbol_t = gc_program_symbol;
-pub type gc_core_string_t = gc_program_symbol_t;
 unsafe extern "C" {
     pub fn gc_core_string__create_from(
         str_: *const ::core::ffi::c_char,
@@ -458,7 +527,7 @@ unsafe extern "C" {
     pub fn gc_buffer__add_byte_size(self_: *mut gc_buffer_t, value: u64_t);
 }
 unsafe extern "C" {
-    pub fn gc_buffer__prepare(self_: *mut gc_buffer_t, needed: u32_t);
+    pub fn gc_buffer__prepare(self_: *mut gc_buffer_t, needed: u64_t);
 }
 unsafe extern "C" {
     pub fn gc_buffer__add_abi_headers(self_: *mut gc_buffer_t, prog: *const gc_program_t);
@@ -467,10 +536,10 @@ unsafe extern "C" {
     pub fn gc_buffer__data(self_: *mut gc_buffer_t) -> *mut ::core::ffi::c_char;
 }
 unsafe extern "C" {
-    pub fn gc_buffer__size(self_: *mut gc_buffer_t) -> u32_t;
+    pub fn gc_buffer__size(self_: *mut gc_buffer_t) -> u64_t;
 }
 unsafe extern "C" {
-    pub fn gc_buffer__capacity(self_: *mut gc_buffer_t) -> u32_t;
+    pub fn gc_buffer__capacity(self_: *mut gc_buffer_t) -> u64_t;
 }
 unsafe extern "C" {
     pub fn gc_buffer__add_size(self_: *mut gc_buffer_t, size_inc: i32_t);
@@ -503,21 +572,8 @@ unsafe extern "C" {
     #[doc = " core::Buffer"]
     pub fn gc_core_buffer__body(self_: *mut gc_object_t) -> *mut gc_buffer_t;
 }
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct gc_core_map {
-    _unused: [u8; 0],
-}
-#[doc = " Map"]
-pub type gc_core_map_t = gc_core_map;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct gc_core_array {
-    _unused: [u8; 0],
-}
-#[doc = " Array"]
-pub type gc_core_array_t = gc_core_array;
 unsafe extern "C" {
+    #[doc = " Array"]
     pub fn gc_core_array__set_slot(
         self_: *mut gc_core_array_t,
         offset: u32_t,
@@ -546,16 +602,10 @@ unsafe extern "C" {
     pub fn gc_core_array__remove_all(self_: *mut gc_core_array_t, ctx: *mut gc_machine_t);
 }
 unsafe extern "C" {
-    pub fn gc_core_array__size(self_: *mut gc_core_array_t) -> u32_t;
+    pub fn gc_core_array__size(self_: *const gc_core_array_t) -> u32_t;
 }
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct gc_core_table {
-    _unused: [u8; 0],
-}
-#[doc = " Table"]
-pub type gc_core_table_t = gc_core_table;
 unsafe extern "C" {
+    #[doc = " Table"]
     pub fn gc_core_table__create(ctx: *const gc_machine_t) -> *mut gc_core_table_t;
 }
 unsafe extern "C" {
@@ -606,14 +656,8 @@ unsafe extern "C" {
         type_d: u32_t,
     ) -> bool;
 }
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct gc_core_tensor {
-    _unused: [u8; 0],
-}
-#[doc = " Tensor"]
-pub type gc_core_tensor_t = gc_core_tensor;
 unsafe extern "C" {
+    #[doc = " Tensor"]
     pub fn gc_core_tensor__create(ctx: *const gc_machine_t) -> *mut gc_core_tensor_t;
 }
 unsafe extern "C" {
@@ -1331,39 +1375,6 @@ unsafe extern "C" {
 unsafe extern "C" {
     pub fn gc_core_tensor__get_data(t: *mut gc_core_tensor_t) -> *mut ::core::ffi::c_char;
 }
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct gc_core_tensor_descriptor {
-    pub dim: [i64_t; 8usize],
-    pub nb_dim: i8_t,
-    pub batch_dim: i8_t,
-    pub type_: u8_t,
-    pub nature: u8_t,
-    pub size: i64_t,
-    pub capacity: i64_t,
-}
-#[allow(clippy::unnecessary_operation, clippy::identity_op)]
-const _: () = {
-    ["Size of gc_core_tensor_descriptor"]
-        [::core::mem::size_of::<gc_core_tensor_descriptor>() - 88usize];
-    ["Alignment of gc_core_tensor_descriptor"]
-        [::core::mem::align_of::<gc_core_tensor_descriptor>() - 8usize];
-    ["Offset of field: gc_core_tensor_descriptor::dim"]
-        [::core::mem::offset_of!(gc_core_tensor_descriptor, dim) - 0usize];
-    ["Offset of field: gc_core_tensor_descriptor::nb_dim"]
-        [::core::mem::offset_of!(gc_core_tensor_descriptor, nb_dim) - 64usize];
-    ["Offset of field: gc_core_tensor_descriptor::batch_dim"]
-        [::core::mem::offset_of!(gc_core_tensor_descriptor, batch_dim) - 65usize];
-    ["Offset of field: gc_core_tensor_descriptor::type_"]
-        [::core::mem::offset_of!(gc_core_tensor_descriptor, type_) - 66usize];
-    ["Offset of field: gc_core_tensor_descriptor::nature"]
-        [::core::mem::offset_of!(gc_core_tensor_descriptor, nature) - 67usize];
-    ["Offset of field: gc_core_tensor_descriptor::size"]
-        [::core::mem::offset_of!(gc_core_tensor_descriptor, size) - 72usize];
-    ["Offset of field: gc_core_tensor_descriptor::capacity"]
-        [::core::mem::offset_of!(gc_core_tensor_descriptor, capacity) - 80usize];
-};
-pub type gc_core_tensor_descriptor_t = gc_core_tensor_descriptor;
 unsafe extern "C" {
     pub fn gc_core_tensor__get_descriptor(
         t: *mut gc_core_tensor_t,
@@ -1569,21 +1580,6 @@ unsafe extern "C" {
         str_len: u32_t,
     ) -> u8_t;
 }
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct gc_object {
-    pub block: *mut gc_block_t,
-    pub marks: u32_t,
-    pub type_id: u32_t,
-}
-#[allow(clippy::unnecessary_operation, clippy::identity_op)]
-const _: () = {
-    ["Size of gc_object"][::core::mem::size_of::<gc_object>() - 16usize];
-    ["Alignment of gc_object"][::core::mem::align_of::<gc_object>() - 8usize];
-    ["Offset of field: gc_object::block"][::core::mem::offset_of!(gc_object, block) - 0usize];
-    ["Offset of field: gc_object::marks"][::core::mem::offset_of!(gc_object, marks) - 8usize];
-    ["Offset of field: gc_object::type_id"][::core::mem::offset_of!(gc_object, type_id) - 12usize];
-};
 unsafe extern "C" {
     pub fn gc_malloc(size: usize) -> *mut ::core::ffi::c_void;
 }
@@ -1882,7 +1878,7 @@ unsafe extern "C" {
     ) -> u32_t;
 }
 unsafe extern "C" {
-    #[doc = " @brief Adds multiple headers to the request from a `core::Array<io::HttpHeader>` object.\n\n @param req The HTTP request to modify\n @param headers Must be a `core::Map<String,String>` object, otherwise the function fails\n @param ctx Machine context for object manipulation\n @returns `true` if all headers were added successfully, `false` if `headers` is not the correct type"]
+    #[doc = " @brief Adds multiple headers to the request from a `core::Array<io::HttpHeader>` object.\n\n @param req The HTTP request to modify\n @param headers Must be a `core::Map<String,String>` object, otherwise the function fails\n @returns `true` if all headers were added successfully, `false` if `headers` is not the correct type"]
     pub fn gc_http_request__add_headers_map(
         req: *mut gc_http_request_t,
         headers: *mut gc_core_map_t,
@@ -2095,8 +2091,8 @@ unsafe extern "C" {
         body: gc_program_function_body_t,
         self_: gc_slot_t,
         self_type: gc_type_t,
-        params: *mut gc_slot_t,
-        params_type: *mut gc_type_t,
+        params: *const gc_slot_t,
+        params_type: *const gc_type_t,
         nb_params: u32_t,
         marked_res: *mut gc_slot_t,
         marked_res_type: *mut gc_type_t,
