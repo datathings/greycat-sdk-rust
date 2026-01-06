@@ -14,7 +14,7 @@ unsafe extern "C" {
     pub fn gc_free(ptr: *mut ::core::ffi::c_void, size: usize);
 }
 unsafe extern "C" {
-    pub fn gc_aligned_free(ptr: *mut ::core::ffi::c_void);
+    pub fn gc_aligned_free(ptr: *mut ::core::ffi::c_void, size: usize);
 }
 unsafe extern "C" {
     pub fn gc_align_malloc(size: usize, block_size: usize) -> *mut ::core::ffi::c_void;

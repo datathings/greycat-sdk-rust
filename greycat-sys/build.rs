@@ -1,6 +1,8 @@
 use std::process::Command;
 
 fn main() {
+    println!("cargo:rerun-if-changed=project.gcl");
+
     Command::new("greycat")
         .arg("install")
         .output()
