@@ -35,9 +35,10 @@ impl<'abi> HeaderValue<'abi> {
     }
 }
 
-#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Hash)]
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Hash, Default)]
 #[serde(untagged)]
 pub enum Value<'abi> {
+    #[default]
     Null,
     Int(i64),
     Float(std_n::core::Float),
@@ -57,12 +58,6 @@ pub enum Value<'abi> {
     String(String),
     Enum(GcEnum<'abi>),
     Obj(GcObject<'abi>),
-}
-
-impl std::default::Default for Value<'_> {
-    fn default() -> Self {
-        Self::Null
-    }
 }
 
 impl From<&serde_json::Value> for Value<'_> {

@@ -6,11 +6,6 @@ fn main() {
         .output()
         .expect("unable to run: greycat install");
 
-    // let greycat_headers =
-    //     find_greycat_headers("lib/std/include").expect("unable to find greycat headers");
-
-    // eprintln!("{greycat_headers:#?}");
-
     let bindings = bindgen::Builder::default()
         .header("lib/std/include/greycat.h")
         .clang_arg("-Ilib/std/include")
