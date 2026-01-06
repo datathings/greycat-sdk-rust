@@ -14,7 +14,7 @@ exclude = ["examples"]
 resolver = "2"
 
 [workspace.package]
-version = "7.5.0-stable"
+version = "7.6.0-dev"
 edition = "2021"
 authors = ["Maxime Tricoire <maxime.tricoire@datathings.com>"]
 license = "Apache-2.0"

@@ -174,6 +174,7 @@ impl<T> ::core::fmt::Debug for __IncompleteArrayField<T> {
 }
 pub const gc_crypto_sha256_len: u32 = 32;
 pub const gc_compiler_tags_max: u32 = 2;
+pub const gc_object_bitset_block_size: u32 = 8;
 pub type i8_t = i8;
 pub type u8_t = u8;
 pub type u16_t = u16;
@@ -424,6 +425,41 @@ const _: () = {
         [::core::mem::offset_of!(gc_object_type, type_) - 56usize];
 };
 pub type gc_object_type_t = gc_object_type;
+unsafe extern "C" {
+    pub fn gc_slot__save(
+        slot: gc_slot_t,
+        slot_type: gc_type_t,
+        buffer: *mut gc_buffer_t,
+        prog: *const gc_program_t,
+        finalize: bool,
+    );
+}
+unsafe extern "C" {
+    pub fn gc_slot__save_value(
+        slot: gc_slot_t,
+        slot_type: gc_type_t,
+        buffer: *mut gc_buffer_t,
+        prog: *const gc_program_t,
+        finalize: bool,
+    );
+}
+unsafe extern "C" {
+    pub fn gc_slot__load(
+        slot: *mut gc_slot_t,
+        owner: *mut gc_block_t,
+        buffer: *mut gc_buffer_t,
+        ctx: *const gc_machine_t,
+    ) -> gc_type_t;
+}
+unsafe extern "C" {
+    pub fn gc_slot__load_value(
+        t: gc_type_t,
+        slot: *mut gc_slot_t,
+        owner: *mut gc_block_t,
+        buffer: *mut gc_buffer_t,
+        ctx: *const gc_machine_t,
+    ) -> gc_type_t;
+}
 pub const gc_abi_precision_1: gc_abi_precision = 0;
 pub const gc_abi_precision_10: gc_abi_precision = 1;
 pub const gc_abi_precision_100: gc_abi_precision = 2;
@@ -686,8 +722,30 @@ unsafe extern "C" {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct gc_core_array {
-    _unused: [u8; 0],
+    pub header: gc_object_t,
+    pub types: *mut u8_t,
+    pub slots: *mut gc_slot_t,
+    pub size: u32_t,
+    pub capacity: u32_t,
+    pub start: u32_t,
 }
+#[allow(clippy::unnecessary_operation, clippy::identity_op)]
+const _: () = {
+    ["Size of gc_core_array"][::core::mem::size_of::<gc_core_array>() - 48usize];
+    ["Alignment of gc_core_array"][::core::mem::align_of::<gc_core_array>() - 8usize];
+    ["Offset of field: gc_core_array::header"]
+        [::core::mem::offset_of!(gc_core_array, header) - 0usize];
+    ["Offset of field: gc_core_array::types"]
+        [::core::mem::offset_of!(gc_core_array, types) - 16usize];
+    ["Offset of field: gc_core_array::slots"]
+        [::core::mem::offset_of!(gc_core_array, slots) - 24usize];
+    ["Offset of field: gc_core_array::size"]
+        [::core::mem::offset_of!(gc_core_array, size) - 32usize];
+    ["Offset of field: gc_core_array::capacity"]
+        [::core::mem::offset_of!(gc_core_array, capacity) - 36usize];
+    ["Offset of field: gc_core_array::start"]
+        [::core::mem::offset_of!(gc_core_array, start) - 40usize];
+};
 pub type gc_core_array_t = gc_core_array;
 unsafe extern "C" {
     pub fn gc_core_array__set_slot(
@@ -719,6 +777,9 @@ unsafe extern "C" {
 }
 unsafe extern "C" {
     pub fn gc_core_array__size(self_: *const gc_core_array_t) -> u32_t;
+}
+unsafe extern "C" {
+    pub fn gc_core_array__init(self_: *mut gc_core_array_t, capacity: u32_t);
 }
 #[doc = " definition of block identification key (unsigned 64 bits, limited to 48 bits usage)"]
 pub type gc_block_key_t = u64_t;
@@ -1450,6 +1511,17 @@ unsafe extern "C" {
 }
 unsafe extern "C" {
     pub fn gc_core_buffer__body(self_: *mut gc_object_t) -> *mut gc_buffer_t;
+}
+unsafe extern "C" {
+    pub fn gc_buffer__add(
+        this: *mut gc_buffer_t,
+        slot: gc_slot_t,
+        type_: gc_type_t,
+        prog: *const gc_program_t,
+    );
+}
+unsafe extern "C" {
+    pub fn gc_buffer__pretty_print_new_line(self_: *mut gc_buffer_t, offset: i64_t);
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -2978,6 +3050,9 @@ unsafe extern "C" {
 }
 unsafe extern "C" {
     pub fn gc_machine__error(ctx: *mut gc_machine_t) -> bool;
+}
+unsafe extern "C" {
+    pub fn gc_machine__finalize_object(ctx: *mut gc_machine_t, obj: *mut gc_object_t);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]

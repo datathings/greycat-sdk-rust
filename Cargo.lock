@@ -90,7 +90,7 @@ checksum = "b35204fbdc0b3f4446b89fc1ac2cf84a8a68971995d0bf2e925ec7cd960f9cb3"
 
 [[package]]
 name = "cargo-greycat"
-version = "7.5.0-stable"
+version = "7.6.0-dev"
 dependencies = [
  "anyhow",
  "serde",
@@ -208,7 +208,7 @@ checksum = "a8d1add55171497b4705a648c6b583acafb01d58050a51727785f0b2c8e0a2b2"
 
 [[package]]
 name = "greycat"
-version = "7.5.0-stable"
+version = "7.6.0-dev"
 dependencies = [
  "anyhow",
  "greycat-macro",
@@ -217,7 +217,7 @@ dependencies = [
 
 [[package]]
 name = "greycat-abi"
-version = "7.5.0-stable"
+version = "7.6.0-dev"
 dependencies = [
  "anyhow",
  "greycat",
@@ -229,7 +229,7 @@ dependencies = [
 
 [[package]]
 name = "greycat-gcb"
-version = "7.5.0-stable"
+version = "7.6.0-dev"
 dependencies = [
  "anyhow",
  "greycat",
@@ -238,7 +238,7 @@ dependencies = [
 
 [[package]]
 name = "greycat-macro"
-version = "7.5.0-stable"
+version = "7.6.0-dev"
 dependencies = [
  "quote",
  "syn",
@@ -246,7 +246,7 @@ dependencies = [
 
 [[package]]
 name = "greycat-sdk"
-version = "7.5.0-stable"
+version = "7.6.0-dev"
 dependencies = [
  "anyhow",
  "byteorder",
@@ -260,7 +260,7 @@ dependencies = [
 
 [[package]]
 name = "greycat-sys"
-version = "7.5.0-stable"
+version = "7.6.0-dev"
 dependencies = [
  "bindgen",
 ]
